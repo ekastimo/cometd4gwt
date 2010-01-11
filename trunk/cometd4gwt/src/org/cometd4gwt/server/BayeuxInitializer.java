@@ -11,12 +11,12 @@ import org.cometd.Bayeux;
 
 @SuppressWarnings("serial")
 public class BayeuxInitializer extends GenericServlet {
-	
+
+	public static ComentServer comentServer;
+
 	public void init() throws ServletException {
-		System.err.println("BayeuxInitializer.init()");
-		
 		Bayeux bayeux = (Bayeux) getServletContext().getAttribute(Bayeux.ATTRIBUTE);
-		new HelloService(bayeux);
+		comentServer = new ComentServer(bayeux);
 	}
 
 	public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.cometd.Bayeux;
 import org.cometd.BayeuxListener;
+import org.cometd.Channel;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.server.BayeuxService;
@@ -31,6 +32,7 @@ public class HelloService extends BayeuxService {
 	}
 	
 	public void createChannel() {
+		Channel channel = getBayeux().getChannel("", true);
 		getBayeux().addListener(new BayeuxListener() {
 		});
 	}

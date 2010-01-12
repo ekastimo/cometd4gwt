@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="Cometd4Gwt" default="build" basedir=".">
+
+	<property file="build.properties"/>
+		
+	<path id="project.classpath">
+		<pathelement location="war/WEB-INF/classes" />
+		<fileset dir="war/WEB-INF/lib" includes="**/*.jar" />
+
+		<pathelement location="${gwt.sdk}/gwt-user.jar" />
+		<fileset dir="${gwt.sdk}" includes="gwt-dev*.jar" />
+	</path>
+
+	<target name="javac" description="Compile java source">
+		<mkdir dir="war/WEB-INF/classes" />
+		<javac srcdir="src" includes="**" encoding="utf-8" destdir="war/WEB-INF/classes" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source">
+			<classpath refid="project.classpath" />
+		</javac>
+		<copy todir="war/WEB-INF/classes">
+			<fileset dir="../playfish-core/src" excludes="**/*.java" />
+			<fileset file="rebel.xml" />
+		</copy>
+	</target>
+
+	<target name="gwtc" depends="javac" description="GWT compile to JavaScript">
+		<java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+			<classpath>
+				<pathelement path="${src.all}" />
+				<path refid="project.classpath" />
+			</classpath>
+			<jvmarg value="-Xmx512M" />
+			<arg value="org.cometd4gwt.Cometd4Gwt" />
+		</java>
+	</target>
+
+	<target name="war" description="Create a war file">
+		<zip destfile="Cometd4Gwt.war" basedir="war" excludes="**/*.jar" />
+	</target>
+
+	<target name="build" depends="gwtc, war" />
+
+</project>

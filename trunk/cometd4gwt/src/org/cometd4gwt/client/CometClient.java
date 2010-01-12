@@ -3,7 +3,7 @@ package org.cometd4gwt.client;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CometClient implements CometConstants {
+public class CometClient {
 	private List<CometConnectionListener> connectionListeners = new ArrayList<CometConnectionListener>();
 
 	/**
@@ -16,7 +16,7 @@ public class CometClient implements CometConstants {
 	 */
 	public native void subscribe(String channel, CometMessageConsumer consumer)/*-{
 		$wnd.dojox.cometd.subscribe(channel, function(message){
-			var isSerialable = @org.cometd4gwt.client.Deserializer::toObject(Ljava/lang/String;)(message.data.greeting);
+			var isSerialable = @org.cometd4gwt.client.Deserializer::toObject(Ljava/lang/String;)(message.data.serializedString);
 			consumer.@org.cometd4gwt.client.CometMessageConsumer::onMessageReceived(Lcom/google/gwt/user/client/rpc/IsSerializable;)(isSerialable);
 		})
 	}-*/;
@@ -41,6 +41,7 @@ public class CometClient implements CometConstants {
 
 		    cometd.configure({
 		        url: config.@org.cometd4gwt.client.ConnectionConfig::url,
+		        maxConnection: config.@org.cometd4gwt.client.ConnectionConfig::maxConnection,
 		        logLevel: 'debug'
 		    });
 

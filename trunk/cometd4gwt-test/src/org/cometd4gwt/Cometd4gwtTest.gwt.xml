@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='cometd4gwtTest'>
+  <inherits name='com.google.gwt.user.User'/>
+  <inherits name='com.google.gwt.user.theme.standard.Standard'/>
+  <inherits name='org.cometd4gwt.Cometd4gwt'/>
+  
+  <entry-point class='org.cometd4gwt.client.Cometd4gwtTest'/>
+</module>

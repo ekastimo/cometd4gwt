@@ -20,6 +20,13 @@ public class CometClient {
 			consumer.@org.cometd4gwt.client.CometMessageConsumer::onMessageReceived(Lcom/google/gwt/user/client/rpc/IsSerializable;)(isSerialable);
 		})
 	}-*/;
+	
+	public native void addListener(String channel, CometMessageConsumer consumer)/*-{
+		$wnd.dojox.cometd.addListener(channel, function(message){
+			var isSerialable = @org.cometd4gwt.client.Deserializer::toObject(Ljava/lang/String;)(message.data.serializedString);
+			consumer.@org.cometd4gwt.client.CometMessageConsumer::onMessageReceived(Lcom/google/gwt/user/client/rpc/IsSerializable;)(isSerialable);
+		})
+	}-*/;
 
 	public native void publish(String channel, String message) /*-{
 		$wnd.dojox.cometd.publish(channel, { name: message });
@@ -40,6 +47,7 @@ public class CometClient {
 		    });
 
 		    cometd.configure({
+		        requestHeaders: config.@org.cometd4gwt.client.ConnectionConfig::requestHeaders,
 		        url: config.@org.cometd4gwt.client.ConnectionConfig::url,
 		        maxConnection: config.@org.cometd4gwt.client.ConnectionConfig::maxConnection,
 		        logLevel: 'debug'

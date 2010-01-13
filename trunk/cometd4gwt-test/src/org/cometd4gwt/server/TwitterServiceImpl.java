@@ -13,11 +13,11 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterService {
 
-	private CometServer cometServer;
+	private CometDServer cometServer;
 
 	@Override
 	public void init() throws ServletException {
-		cometServer = (CometServer) getServletContext().getAttribute(CometServer.ATTRIBUTE);
+		cometServer = (CometDServer) getServletContext().getAttribute(CometDServer.ATTRIBUTE);
 		cometServer.addClientConnectionListener(new ClientConnectionListener() {
 
 			@Override

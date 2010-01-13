@@ -25,6 +25,18 @@
 		<url-pattern>/cometd/*</url-pattern>
 	</filter-mapping>
 
+	<!-- 	
+	<filter>
+		<filter-name>CometHeaderReader</filter-name>
+		<filter-class>org.cometd4gwt.server.CometHeaderReader</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>CometHeaderReader</filter-name>
+		<url-pattern>/cometd/*</url-pattern>
+	</filter-mapping>
+	 -->
+
 	<servlet>
 		<servlet-name>initializer</servlet-name>
 		<servlet-class>org.cometd4gwt.server.BayeuxInitializer</servlet-class>

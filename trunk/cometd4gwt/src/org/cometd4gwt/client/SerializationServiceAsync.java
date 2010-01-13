@@ -4,5 +4,5 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public interface SerializationServiceAsync {
-	void getSerializable(AsyncCallback<IsSerializable> callback);
+	void getSerializable(IsSerializable isSerializable, AsyncCallback<IsSerializable> callback);
 }

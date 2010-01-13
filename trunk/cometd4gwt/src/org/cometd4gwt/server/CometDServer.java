@@ -10,19 +10,26 @@ import org.cometd.Channel;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.server.BayeuxService;
+import org.cometd4gwt.client.CometConstants;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class CometServer extends BayeuxService {
+public class CometDServer extends BayeuxService implements CometConstants {
 	public static final String ATTRIBUTE = "org.cometd4gwt.CometServer";
 
 	private List<ClientConnectionListener> ccls = new ArrayList<ClientConnectionListener>();
 
-	public CometServer(Bayeux bayeux) {
+	public CometDServer(Bayeux bayeux) {
 		super(bayeux, "hello");
 
+		subscribe("/twitter", "onTest");
+		
 		subscribe("/meta/connect", "onConnect");
 		subscribe("/meta/disconnect", "onDisconnect");
+	}
+
+	public void onTest(Client remote, Message message) {
+		System.err.println("remote=" + remote + ", message=" + message);
 	}
 
 	public void onConnect(Client remote, Message message) {
@@ -73,7 +80,7 @@ public class CometServer extends BayeuxService {
 
 	public void publish(String channelId, IsSerializable message) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("serializedString", Serializer.toString(message));
+		map.put(SERIALIZED_STRING, ServerSerializer.toString(message));
 		getBayeux().getChannel(channelId, true).publish(null, map, null);
 	}
 }

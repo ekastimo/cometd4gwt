@@ -8,11 +8,11 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.server.rpc.RPC;
 
-public class Serializer {
+public class ServerSerializer {
 
 	public static String toString(IsSerializable object) {
 		try {
-			Method serviceMethod = SerializationService.class.getMethod("getSerializable");
+			Method serviceMethod = SerializationService.class.getMethod("getSerializable", IsSerializable.class);
 			return RPC.encodeResponseForSuccess(serviceMethod, object);
 		} catch (SecurityException e) {
 			e.printStackTrace();

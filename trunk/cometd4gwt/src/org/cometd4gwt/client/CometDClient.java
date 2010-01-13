@@ -3,7 +3,9 @@ package org.cometd4gwt.client;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CometClient {
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+public class CometDClient {
 	private List<CometConnectionListener> connectionListeners = new ArrayList<CometConnectionListener>();
 
 	/**
@@ -14,22 +16,27 @@ public class CometClient {
 	 * also check - The wildcards can only be specified as last segment of the
 	 * channel
 	 */
-	public native void subscribe(String channel, CometMessageConsumer consumer)/*-{
+	public native void addSubscriber(String channel, CometMessageConsumer consumer)/*-{
 		$wnd.dojox.cometd.subscribe(channel, function(message){
-			var isSerialable = @org.cometd4gwt.client.Deserializer::toObject(Ljava/lang/String;)(message.data.serializedString);
+			var isSerialable = @org.cometd4gwt.client.ClientSerializer::toObject(Ljava/lang/String;)(message.data.serializedString);
 			consumer.@org.cometd4gwt.client.CometMessageConsumer::onMessageReceived(Lcom/google/gwt/user/client/rpc/IsSerializable;)(isSerialable);
 		})
 	}-*/;
-	
+
 	public native void addListener(String channel, CometMessageConsumer consumer)/*-{
 		$wnd.dojox.cometd.addListener(channel, function(message){
-			var isSerialable = @org.cometd4gwt.client.Deserializer::toObject(Ljava/lang/String;)(message.data.serializedString);
+			var isSerialable = @org.cometd4gwt.client.ClientSerializer::toObject(Ljava/lang/String;)(message.data.serializedString);
 			consumer.@org.cometd4gwt.client.CometMessageConsumer::onMessageReceived(Lcom/google/gwt/user/client/rpc/IsSerializable;)(isSerialable);
 		})
 	}-*/;
 
 	public native void publish(String channel, String message) /*-{
 		$wnd.dojox.cometd.publish(channel, { name: message });
+	}-*/;
+
+	public native void publish(String channel, IsSerializable message)/*-{
+		var ss = @org.cometd4gwt.client.ClientSerializer::toString(Lcom/google/gwt/user/client/rpc/IsSerializable;)(message);
+		$wnd.dojox.cometd.publish(channel, { serializedString: ss });
 	}-*/;
 
 	public native void disconnect()/*-{
@@ -58,9 +65,9 @@ public class CometClient {
 		        var wasConnected = _connected;
 		        _connected = message.successful === true;
 		        if (!wasConnected && _connected) {
-		            cometdJava.@org.cometd4gwt.client.CometClient::onConnected()();
+		            cometdJava.@org.cometd4gwt.client.CometDClient::onConnected()();
 		        } else if (wasConnected && !_connected) {
-		            cometdJava.@org.cometd4gwt.client.CometClient::onDisconnected()();
+		            cometdJava.@org.cometd4gwt.client.CometDClient::onDisconnected()();
 		        }
 		    });
 

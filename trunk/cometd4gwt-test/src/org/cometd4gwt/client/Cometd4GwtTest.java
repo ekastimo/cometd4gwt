@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
-public class Cometd4GwtTest implements EntryPoint {
+public class Cometd4GwtTest implements EntryPoint, CometConstants {
 	final CometDClient cometClient = new CometDClient();
 
 	public void onModuleLoad() {
@@ -27,16 +27,32 @@ public class Cometd4GwtTest implements EntryPoint {
 				cometClient.addSubscriber(ChannelOf.TWITTER, new CometMessageConsumer() {
 					@Override
 					public void onMessageReceived(IsSerializable message) {
-						log("--" + message);
+						log("1-" + message);
 					}
 				});
 
-//				cometClient.addListener(ChannelOf.TWITTER, new CometMessageConsumer() {
+//				cometClient.addSubscriber(ChannelOf.TWITTER2, new CometMessageConsumer() {
 //					@Override
 //					public void onMessageReceived(IsSerializable message) {
-//						log("--" + message);
+//						log("2-" + message);
 //					}
 //				});
+
+//				cometClient.executeBatch(new BatchExecution() {
+//					@Override
+//					public void execute() {
+//						System.err.println("executing batch");
+//
+//						cometClient.addSubscriber(ChannelOf.TWITTER2, new CometMessageConsumer() {
+//							@Override
+//							public void onMessageReceived(IsSerializable message) {
+//								log("2-" + message);
+//							}
+//						});
+//					}
+//				});
+
+//				cometClient.addSubscribers(new String[] { ChannelOf.TWITTER, ChannelOf.TWITTER2 }, null);
 			}
 
 			@Override
@@ -46,8 +62,8 @@ public class Cometd4GwtTest implements EntryPoint {
 		});
 
 		ConnectionConfig connectionConfig = new ConnectionConfig("http://" + Window.Location.getHost() + "/cometd");
-		connectionConfig.maxConnection = 5;
-		connectionConfig.requestHeaders = "{My-Custom-Header:MyValue}";
+		connectionConfig.requestHeaderName = "userId";
+		connectionConfig.requestHeaderValue = "123";
 		cometClient.connect(connectionConfig);
 	}
 
@@ -62,11 +78,8 @@ public class Cometd4GwtTest implements EntryPoint {
 				int keyCode = event.getNativeKeyCode();
 				if (keyCode == '\n' || keyCode == '\r') {
 					Tweet tweet = new Tweet(new Date(), textArea.getText().trim());
-//					Window.alert(ClientSerializer.toString(tweet));
-
-					twitterService.publishTweet(tweet, new DefaultAsyncCallback<Void>());
-
 					textArea.setText("");
+					twitterService.publishTweet(tweet, new DefaultAsyncCallback<Void>());
 				}
 			}
 		});

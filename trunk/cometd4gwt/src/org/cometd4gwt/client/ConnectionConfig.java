@@ -49,7 +49,8 @@ public class ConnectionConfig {
 	 * An object containing the request headers to be sent for every bayeux
 	 * request (for example: {"My-Custom- Header":"MyValue"})
 	 */
-	public String requestHeaders = "{}";
+	public String requestHeaderName = "requestHeaders";
+	public String requestHeaderValue = "";
 
 	public ConnectionConfig(String url) {
 		this.url = url;

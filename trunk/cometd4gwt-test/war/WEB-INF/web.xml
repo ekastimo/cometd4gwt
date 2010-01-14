@@ -9,6 +9,10 @@
 	<servlet>
 		<servlet-name>cometd</servlet-name>
 		<servlet-class>org.cometd.server.continuation.ContinuationCometdServlet</servlet-class>
+		<init-param>
+			<param-name>requestAvailable</param-name>
+			<param-value>true</param-value>
+		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
@@ -24,18 +28,6 @@
 		<filter-name>continuation</filter-name>
 		<url-pattern>/cometd/*</url-pattern>
 	</filter-mapping>
-
-	<!-- 	
-	<filter>
-		<filter-name>CometHeaderReader</filter-name>
-		<filter-class>org.cometd4gwt.server.CometHeaderReader</filter-class>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>CometHeaderReader</filter-name>
-		<url-pattern>/cometd/*</url-pattern>
-	</filter-mapping>
-	 -->
 
 	<servlet>
 		<servlet-name>initializer</servlet-name>

@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class CometDClient {
 	private List<CometConnectionListener> connectionListeners = new ArrayList<CometConnectionListener>();
-
+	
 	/**
 	 * TODO - also add addListenner and check all the preconditions (is
 	 * handshake called or is it a meta channel? etc) before calling as well as
@@ -17,10 +17,21 @@ public class CometDClient {
 	 * channel
 	 */
 	public native void addSubscriber(String channel, CometMessageConsumer consumer)/*-{
-		$wnd.dojox.cometd.subscribe(channel, function(message){
+		var subscription =  $wnd.dojox.cometd.subscribe(channel, function(message){
 			var isSerialable = @org.cometd4gwt.client.ClientSerializer::toObject(Ljava/lang/String;)(message.data.serializedString);
 			consumer.@org.cometd4gwt.client.CometMessageConsumer::onMessageReceived(Lcom/google/gwt/user/client/rpc/IsSerializable;)(isSerialable);
 		})
+	}-*/;
+
+	public native void addSubscribers(String[] channel, CometMessageConsumer[] consumer)/*-{
+		var cometd = $wnd.dojox.cometd;
+		$wnd.alert("length=");
+		$wnd.alert("length=" + channel.length());
+//		for(i = 0; i < )
+//		cometd.subscribe(channel, function(message){
+//			var isSerialable = @org.cometd4gwt.client.ClientSerializer::toObject(Ljava/lang/String;)(message.data.serializedString);
+//			consumer.@org.cometd4gwt.client.CometMessageConsumer::onMessageReceived(Lcom/google/gwt/user/client/rpc/IsSerializable;)(isSerialable);
+//		})
 	}-*/;
 
 	public native void addListener(String channel, CometMessageConsumer consumer)/*-{
@@ -43,6 +54,7 @@ public class CometDClient {
 		$wnd.dojox.cometd.disconnect();
 	}-*/;
 
+	// TODO - enable sending custom request header 
 	public native void connect(ConnectionConfig config)/*-{
 		$wnd.dojo.require("dojox.cometd");
 		var cometdJava = this;
@@ -53,8 +65,10 @@ public class CometDClient {
 		        cometd.disconnect();
 		    });
 
+			// var name = config.@org.cometd4gwt.client.ConnectionConfig::requestHeaderName;
+			var value = config.@org.cometd4gwt.client.ConnectionConfig::requestHeaderValue;
 		    cometd.configure({
-		        requestHeaders: config.@org.cometd4gwt.client.ConnectionConfig::requestHeaders,
+		        requestHeaders: {requestHeader:value},
 		        url: config.@org.cometd4gwt.client.ConnectionConfig::url,
 		        maxConnection: config.@org.cometd4gwt.client.ConnectionConfig::maxConnection,
 		        logLevel: 'debug'
@@ -77,9 +91,16 @@ public class CometDClient {
 
 	// FIXME - not working :(
 	public native void executeBatch(BatchExecution batchExecution) /*-{
-		$wnd.dojox.cometd.batch(function() {
-			batchExecution.@org.cometd4gwt.client.BatchExecution::execute();
-		});
+		var cometd = $wnd.dojox.cometd;
+		batchExecution.@org.cometd4gwt.client.BatchExecution::execute();
+		
+//		cometd.batch(function() {
+//			batchExecution.@org.cometd4gwt.client.BatchExecution::execute();
+//		});
+		
+//		cometd.startBatch();
+//		batchExecution.@org.cometd4gwt.client.BatchExecution::execute();
+//		cometd.endBatch();
 	}-*/;
 
 	public void addConnectionListener(CometConnectionListener connectionListener) {

@@ -22,14 +22,18 @@ public class CometHeaderReader implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException,
 			ServletException {
 
-		System.err.println("filter calling for " + request);
+//		System.err.println("filter calling for " + request);
 		HttpServletRequest servletRequest = (HttpServletRequest) request;
-		Enumeration<?> e = servletRequest.getHeaderNames();
-		while (e.hasMoreElements()) {
-			Object headersName = e.nextElement();
-			System.out.println(headersName + "=" + servletRequest.getHeader("" + headersName));
-		}
-		
+		System.err.println("servletRequest.getRequestURL()=" + servletRequest.getRequestURL());
+		System.err.println("servletRequest.getHeader(userId)=" + servletRequest.getHeader("userId"));
+		System.err.println("servletRequest.getHeader(name)=" + servletRequest.getHeader("name"));
+
+//		Enumeration<?> e = servletRequest.getHeaderNames();
+//		while (e.hasMoreElements()) {
+//			Object headersName = e.nextElement();
+//			System.out.println(headersName + "=" + servletRequest.getHeader("" + headersName));
+//		}
+
 		filterChain.doFilter(request, response);
 	}
 

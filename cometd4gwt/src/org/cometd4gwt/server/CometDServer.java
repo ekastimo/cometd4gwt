@@ -1,9 +1,13 @@
 package org.cometd4gwt.server;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.cometd.Bayeux;
 import org.cometd.Channel;
@@ -18,6 +22,7 @@ public class CometDServer extends BayeuxService implements CometConstants {
 	public static final String ATTRIBUTE = "org.cometd4gwt.CometServer";
 
 	private List<ClientConnectionListener> clientConnectionListeners = new ArrayList<ClientConnectionListener>();
+	private Set<String> connectedClientIds = new HashSet<String>(); //Collections.synchronizedSet();
 
 	public CometDServer(Bayeux bayeux) {
 		super(bayeux, "");
@@ -29,21 +34,30 @@ public class CometDServer extends BayeuxService implements CometConstants {
 	}
 
 	public void test(Client client, Message message) {
-		System.err.println("meta-message: " + message);
+		System.err.println("smeta-message: " + message);
 	}
 
-	// FIXME - be sure that when a client connects for the first time, the message id is 2
 	public void onConnect(Client client, Message message) {
-		if (message.getId().equals("2")) {
-			for (ClientConnectionListener ccl : clientConnectionListeners) {
-				ccl.onConnect(client, getBayeux().getCurrentRequest());
+		if (!connectedClientIds.contains(client.getId())) {
+			synchronized (connectedClientIds) {
+				if (!connectedClientIds.contains(client.getId())) {
+
+					connectedClientIds.add(client.getId());
+					for (ClientConnectionListener ccl : clientConnectionListeners) {
+						ccl.onConnect(client, getBayeux().getCurrentRequest());
+					}
+				}
 			}
 		}
 	}
 
 	public void onDisconnect(Client client, Message message) {
-		for (ClientConnectionListener ccl : clientConnectionListeners) {
-			ccl.onDisconnect(client, getBayeux().getCurrentRequest());
+		synchronized (connectedClientIds) {
+			if (connectedClientIds.remove(client.getId())) {
+				for (ClientConnectionListener ccl : clientConnectionListeners) {
+					ccl.onDisconnect(client, getBayeux().getCurrentRequest());
+				}
+			}
 		}
 	}
 

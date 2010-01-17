@@ -25,7 +25,7 @@ public class CometDServer extends BayeuxService implements CometConstants {
 		subscribe("/meta/connect", "onConnect");
 		subscribe("/meta/disconnect", "onDisconnect");
 
-		subscribe("/meta/*", "test");
+		// subscribe("/meta/*", "test");
 	}
 
 	public void test(Client client, Message message) {

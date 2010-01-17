@@ -5,7 +5,8 @@
 
 <web-app>
 
-	<!-- Servlets -->
+	<!-- Comet Servlets -->
+
 	<servlet>
 		<servlet-name>cometd</servlet-name>
 		<servlet-class>org.cometd.server.continuation.ContinuationCometdServlet</servlet-class>
@@ -36,6 +37,17 @@
 	</servlet>
 
 	<servlet>
+		<servlet-name>serializationService</servlet-name>
+		<servlet-class>org.cometd4gwt.server.SerializationServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>serializationService</servlet-name>
+		<url-pattern>/Cometd4GwtTest/serializationService</url-pattern>
+	</servlet-mapping>
+
+	<!-- Test Servlet -->
+	<servlet>
 		<servlet-name>twitterServlet</servlet-name>
 		<servlet-class>org.cometd4gwt.server.TwitterServiceImpl</servlet-class>
 		<load-on-startup>3</load-on-startup>
@@ -44,16 +56,6 @@
 	<servlet-mapping>
 		<servlet-name>twitterServlet</servlet-name>
 		<url-pattern>/Cometd4GwtTest/twitter</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>serializationService</servlet-name>
-		<servlet-class>org.cometd4gwt.server.SerializationServiceImpl</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>serializationService</servlet-name>
-		<url-pattern>/Cometd4GwtTest/serializationService</url-pattern>
 	</servlet-mapping>
 
 </web-app>

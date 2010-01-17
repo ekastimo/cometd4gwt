@@ -5,28 +5,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/cometd4gwt"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-api-1.0.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-java-client-1.0.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-java-oort-1.0.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-java-server-1.0.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-server-6.1.22.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-servlet.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-client-7.0.1.v20091125.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-continuation-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-deploy-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-http-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-io-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-jmx-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-jndi-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-plus-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-policy-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-rewrite-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-security-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-server-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-servlet-7.0.1.v20091125.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-servlets-7.0.1.v20091125.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-util-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-webapp-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jetty-xml-7.0.1.v20091125.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api-2.5.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

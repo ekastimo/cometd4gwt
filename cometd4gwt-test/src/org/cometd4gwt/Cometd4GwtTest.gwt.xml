@@ -3,5 +3,11 @@
 <module rename-to="Cometd4GwtTest">
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="org.cometd4gwt.Cometd4Gwt"/>	
+
 	<entry-point class="org.cometd4gwt.client.Cometd4GwtTest"/>
+
+	<!-- 
+	 -->
+	<set-property name="user.agent" value="gecko" />
+	
 </module>

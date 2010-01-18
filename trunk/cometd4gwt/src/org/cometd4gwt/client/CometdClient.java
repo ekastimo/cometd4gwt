@@ -50,11 +50,12 @@ public class CometdClient implements CometdConstants {
 //		});
 	}
 
-	public void addSubscriber(String channel, CometMessageConsumer consumer) {
-		addSubscriber(channel, consumer, null);
+	public JavaScriptObject addSubscriber(String channel, CometMessageConsumer consumer) {
+		return addSubscriber(channel, consumer, null);
 	}
 
-	public void addSubscriber(String channel, final CometMessageConsumer consumer, JsoListener<Subscription> listener) {
+	public JavaScriptObject addSubscriber(String channel, final CometMessageConsumer consumer,
+			JsoListener<Subscription> listener) {
 		if (!isConnected()) {
 			System.err.println("Subscriber (channel=" + channel + ", consumer=" + consumer
 					+ ") can't be added while not connected");
@@ -62,13 +63,19 @@ public class CometdClient implements CometdConstants {
 			System.err.println(consumer + "cannot be added to any /meta/* channels " + channel);
 		} else {
 			subscriptionListeners.addDisposableListener(channel, listener);
-			cometd.addSubscriber(channel, new JsoListener<GwtSerializedJavaScriptObject>() {
+			return cometd.addSubscriber(channel, new JsoListener<GwtSerializedJavaScriptObject>() {
 				@Override
 				public void onMessageReceived(GwtSerializedJavaScriptObject javaScriptObject) {
 					consumer.onMessageReceived(javaScriptObject.getObject());
 				}
 			});
 		}
+
+		return null;
+	}
+
+	public void unsubscribe(JavaScriptObject subscription) {
+		cometd.unsubscribe(subscription);
 	}
 
 	public void addListener(String channel, JsoListener<? extends JavaScriptObject> receiver) {

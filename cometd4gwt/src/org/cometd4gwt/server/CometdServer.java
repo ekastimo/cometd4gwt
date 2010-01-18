@@ -16,13 +16,13 @@ import org.cometd4gwt.client.CometConstants;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class CometServer extends BayeuxService implements CometConstants {
+public class CometdServer extends BayeuxService implements CometConstants {
 	public static final String ATTRIBUTE = "org.cometd4gwt.CometServer";
 
 	private List<ClientConnectionListener> clientConnectionListeners = new ArrayList<ClientConnectionListener>();
 	private Set<String> connectedClientIds = new HashSet<String>(); //Collections.synchronizedSet();
 
-	public CometServer(Bayeux bayeux) {
+	public CometdServer(Bayeux bayeux) {
 		super(bayeux, "");
 
 		subscribe("/meta/connect", "onConnect");

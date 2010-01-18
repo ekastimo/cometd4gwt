@@ -14,7 +14,7 @@ import com.google.gwt.user.server.rpc.SerializationPolicyProvider;
 public class ServerSerializer {
 
 	private static SerializationPolicyProvider serializationPolicyProvider;
-	private static SerializationPolicy serializationPolicy;
+	private static SerializationPolicy serializationPolicy = null;
 
 	public static String toString(IsSerializable object) {
 		try {
@@ -42,7 +42,9 @@ public class ServerSerializer {
 
 	public static void setSerializationPolicy(SerializationPolicy serializationPolicy) {
 		ServerSerializer.serializationPolicy = serializationPolicy;
-		// TODO Auto-generated method stub
+	}
 
+	public static boolean isSerializationPolicyNull() {
+		return serializationPolicy == null;
 	}
 }

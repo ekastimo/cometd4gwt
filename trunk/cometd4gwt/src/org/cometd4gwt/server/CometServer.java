@@ -1,8 +1,6 @@
 package org.cometd4gwt.server;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,13 +16,13 @@ import org.cometd4gwt.client.CometConstants;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class CometDServer extends BayeuxService implements CometConstants {
+public class CometServer extends BayeuxService implements CometConstants {
 	public static final String ATTRIBUTE = "org.cometd4gwt.CometServer";
 
 	private List<ClientConnectionListener> clientConnectionListeners = new ArrayList<ClientConnectionListener>();
 	private Set<String> connectedClientIds = new HashSet<String>(); //Collections.synchronizedSet();
 
-	public CometDServer(Bayeux bayeux) {
+	public CometServer(Bayeux bayeux) {
 		super(bayeux, "");
 
 		subscribe("/meta/connect", "onConnect");
@@ -38,7 +36,14 @@ public class CometDServer extends BayeuxService implements CometConstants {
 	}
 
 	public void onConnect(Client client, Message message) {
-		if (!connectedClientIds.contains(client.getId())) {
+		// This is a rocket
+		if (ServerSerializer.isSerializationPolicyNull()) {
+			client.deliver(getClient(), SERIALIZATION_POLICY_GENERATE_REQUEST, new HashMap<String, Object>(), null);
+			System.err.println("serializationPolicy=null");
+		}
+
+		//  
+		else if (!connectedClientIds.contains(client.getId())) {
 			synchronized (connectedClientIds) {
 				if (!connectedClientIds.contains(client.getId())) {
 					connectedClientIds.add(client.getId());
@@ -48,7 +53,6 @@ public class CometDServer extends BayeuxService implements CometConstants {
 				}
 			}
 		}
-
 	}
 
 	public void onDisconnect(Client client, Message message) {

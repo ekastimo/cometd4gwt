@@ -1,6 +1,6 @@
 package org.cometd4gwt.client;
 
-public class CometdConnectionMessage extends CometdMetaMessage {
+public class CometdConnectionMessage extends CometdMessage {
 	protected CometdConnectionMessage() {
 	}
 	

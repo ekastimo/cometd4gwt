@@ -4,9 +4,11 @@ import java.util.Date;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -70,7 +72,7 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 		if (!subscribesAdded) {
 			subscribesAdded = true;
 
-			cometdClient.addSubscriber(ChannelOf.TWITTER, new CometMessageConsumer() {
+			final JavaScriptObject subscription = cometdClient.addSubscriber(ChannelOf.TWITTER, new CometMessageConsumer() {
 				@Override
 				public void onMessageReceived(IsSerializable message) {
 					log("--" + message);
@@ -81,6 +83,15 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 					log(subscription._toString());
 				}
 			});
+
+			log("subscription=" + new JSONObject(subscription));
+			
+			new Timer() {
+				@Override
+				public void run() {
+					cometdClient.unsubscribe(subscription);
+				}
+			}.schedule(5000);
 		}
 	}
 

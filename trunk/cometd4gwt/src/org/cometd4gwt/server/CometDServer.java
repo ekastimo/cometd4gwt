@@ -41,7 +41,6 @@ public class CometDServer extends BayeuxService implements CometConstants {
 		if (!connectedClientIds.contains(client.getId())) {
 			synchronized (connectedClientIds) {
 				if (!connectedClientIds.contains(client.getId())) {
-
 					connectedClientIds.add(client.getId());
 					for (ClientConnectionListener ccl : clientConnectionListeners) {
 						ccl.onConnect(client, getBayeux().getCurrentRequest());
@@ -49,6 +48,7 @@ public class CometDServer extends BayeuxService implements CometConstants {
 				}
 			}
 		}
+
 	}
 
 	public void onDisconnect(Client client, Message message) {

@@ -8,21 +8,53 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class CometdClient implements CometConstants {
+public class CometdClient implements CometdConstants {
 
+	private List<ScriptLoadListener> scriptLoadListeners = new ArrayList<ScriptLoadListener>();
 	private List<CometConnectionListener> connectionListeners = new ArrayList<CometConnectionListener>();
 	private SubscriptionListener subscriptionListeners = new SubscriptionListener();
 
-	private boolean firstTimeConnected = true;
+	private boolean isScriptLoaded = false;
 	private boolean wasConnected = false;
 	private CometdJsni cometd = new CometdJsni();
+
+	public CometdClient() {
+		addScriptLoadListener(new ScriptLoadListener() {
+			@Override
+			public void onLoad() {
+				addSubscriptionListeners();
+			}
+
+			@Override
+			public void onUnload() {
+				disconnect();
+			}
+		});
+
+//		cometd.init();
+//		cometd.addScriptLoadListener(new ScriptLoadListener() {
+//
+//			@Override
+//			public void onLoad() {
+//				for (ScriptLoadListener l : scriptLoadListeners) {
+//					l.onLoad();
+//				}
+//			}
+//
+//			@Override
+//			public void onUnload() {
+//				for (ScriptLoadListener l : scriptLoadListeners) {
+//					l.onUnload();
+//				}
+//			}
+//		});
+	}
 
 	public void addSubscriber(String channel, CometMessageConsumer consumer) {
 		addSubscriber(channel, consumer, null);
 	}
 
-	public void addSubscriber(String channel, final CometMessageConsumer consumer,
-			MessageListener<Subscription> listener) {
+	public void addSubscriber(String channel, final CometMessageConsumer consumer, JsoListener<Subscription> listener) {
 		if (!isConnected()) {
 			System.err.println("Subscriber (channel=" + channel + ", consumer=" + consumer
 					+ ") can't be added while not connected");
@@ -30,7 +62,7 @@ public class CometdClient implements CometConstants {
 			System.err.println(consumer + "cannot be added to any /meta/* channels " + channel);
 		} else {
 			subscriptionListeners.addDisposableListener(channel, listener);
-			cometd.addSubscriber(channel, new MessageListener<GwtSerializedJavaScriptObject>() {
+			cometd.addSubscriber(channel, new JsoListener<GwtSerializedJavaScriptObject>() {
 				@Override
 				public void onMessageReceived(GwtSerializedJavaScriptObject javaScriptObject) {
 					consumer.onMessageReceived(javaScriptObject.getObject());
@@ -39,12 +71,7 @@ public class CometdClient implements CometConstants {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private void forwardMessage(String serializedString, CometMessageConsumer consumer) {
-		consumer.onMessageReceived(ClientSerializer.toObject(serializedString));
-	}
-
-	public void addListener(String channel, MessageListener<? extends JavaScriptObject> receiver) {
+	public void addListener(String channel, JsoListener<? extends JavaScriptObject> receiver) {
 		if (channel.startsWith("/meta/") || channel.startsWith("/service/")) {
 			cometd.addListener(channel, receiver);
 		} else {
@@ -70,21 +97,26 @@ public class CometdClient implements CometConstants {
 
 			@Override
 			public void onLoad() {
-				addSubscriptionListeners();
+				for (ScriptLoadListener l : scriptLoadListeners) {
+					l.onLoad();
+				}
 			}
 
 			@Override
 			public void onUnload() {
-				disconnect();
+				for (ScriptLoadListener l : scriptLoadListeners) {
+					l.onUnload();
+				}
 			}
 		});
+
+//		cometd.connect(config);
 	}
 
 	public void addSubscriptionListeners() {
-		addListener(SERIALIZATION_POLICY_GENERATE_REQUEST, new MessageListener<CometdMessage>() {
+		addListener(GENERATE_SERIALIZATION_POLICY_REQUEST, new JsoListener<CometdMessage>() {
 			@Override
 			public void onMessageReceived(CometdMessage javaScriptObject) {
-				System.err.println("SP=" + javaScriptObject);
 				SerializationServiceAsync ss = GWT.create(SerializationService.class);
 				ss.getSerializable(null, new DefaultAsyncCallback<IsSerializable>());
 			}
@@ -92,12 +124,14 @@ public class CometdClient implements CometConstants {
 
 		addListener("/meta/subscribe", subscriptionListeners);
 
-		addListener("/meta/connect", new MessageListener<CometdConnectionMessage>() {
+		addListener("/meta/connect", new JsoListener<CometdConnectionMessage>() {
 			@Override
 			public void onMessageReceived(CometdConnectionMessage connectMessage) {
 				if (!wasConnected && connectMessage.isConnected()) {
 					wasConnected = true;
-					onConnected();
+					for (CometConnectionListener listener : connectionListeners) {
+						listener.onConnected();
+					}
 				} else if (wasConnected && !connectMessage.isConnected()) {
 					wasConnected = false;
 					onDisconnected();
@@ -105,7 +139,7 @@ public class CometdClient implements CometConstants {
 			}
 		});
 
-		addListener("/meta/disconnect", new MessageListener<CometdConnectionMessage>() {
+		addListener("/meta/disconnect", new JsoListener<CometdConnectionMessage>() {
 			@Override
 			public void onMessageReceived(CometdConnectionMessage connectMessage) {
 				System.err.println("DISconnect: " + new JSONObject(connectMessage));
@@ -115,22 +149,12 @@ public class CometdClient implements CometConstants {
 		});
 	}
 
+	public void addScriptLoadListener(ScriptLoadListener scriptLoadListener) {
+		scriptLoadListeners.add(scriptLoadListener);
+	}
+
 	public void addConnectionListener(CometConnectionListener connectionListener) {
 		connectionListeners.add(connectionListener);
-	}
-
-	public void onConnected() {
-		if (firstTimeConnected) {
-			firstTimeConnected = false;
-			onFirstTimeConnected();
-		}
-
-		for (CometConnectionListener listener : connectionListeners) {
-			listener.onConnected();
-		}
-	}
-
-	private void onFirstTimeConnected() {
 	}
 
 	public void onDisconnected() {

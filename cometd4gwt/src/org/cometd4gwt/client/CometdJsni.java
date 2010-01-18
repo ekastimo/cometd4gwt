@@ -2,7 +2,7 @@ package org.cometd4gwt.client;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class Cometd {
+public class CometdJsni {
 
 	native void addSubscriber(String channel, MessageListener<? extends JavaScriptObject> listener)/*-{
 		var subscription = $wnd.dojox.cometd.subscribe(channel, function(message){

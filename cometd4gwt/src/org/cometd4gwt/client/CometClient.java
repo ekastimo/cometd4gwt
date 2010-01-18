@@ -3,17 +3,19 @@ package org.cometd4gwt.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class CometDClient {
+public class CometClient implements CometConstants {
 
 	private List<CometConnectionListener> connectionListeners = new ArrayList<CometConnectionListener>();
 	private SubscriptionListener subscriptionListeners = new SubscriptionListener();
 
+	private boolean firstTimeConnected = true;
 	private boolean wasConnected = false;
-	private Cometd cometd = new Cometd();
+	private CometdJsni cometd = new CometdJsni();
 
 	public void addSubscriber(String channel, CometMessageConsumer consumer) {
 		addSubscriber(channel, consumer, null);
@@ -79,6 +81,15 @@ public class CometDClient {
 	}
 
 	public void addSubscriptionListeners() {
+		addListener(SERIALIZATION_POLICY_GENERATE_REQUEST, new MessageListener<CometdMessage>() {
+			@Override
+			public void onMessageReceived(CometdMessage javaScriptObject) {
+				System.err.println("SP=" + javaScriptObject);
+				SerializationServiceAsync ss = GWT.create(SerializationService.class);
+				ss.getSerializable(null, new DefaultAsyncCallback<IsSerializable>());
+			}
+		});
+
 		addListener("/meta/subscribe", subscriptionListeners);
 
 		addListener("/meta/connect", new MessageListener<CometdConnectionMessage>() {
@@ -109,9 +120,17 @@ public class CometDClient {
 	}
 
 	public void onConnected() {
+		if (firstTimeConnected) {
+			firstTimeConnected = false;
+			onFirstTimeConnected();
+		}
+
 		for (CometConnectionListener listener : connectionListeners) {
 			listener.onConnected();
 		}
+	}
+
+	private void onFirstTimeConnected() {
 	}
 
 	public void onDisconnected() {

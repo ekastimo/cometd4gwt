@@ -8,7 +8,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class CometClient implements CometConstants {
+public class CometdClient implements CometConstants {
 
 	private List<CometConnectionListener> connectionListeners = new ArrayList<CometConnectionListener>();
 	private SubscriptionListener subscriptionListeners = new SubscriptionListener();

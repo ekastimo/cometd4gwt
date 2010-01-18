@@ -6,45 +6,32 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class Cometd4GwtTest implements EntryPoint, CometConstants {
-	final CometDClient cometClient = new CometDClient();
+public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
+	final CometdClient cometdClient = new CometdClient();
+	private boolean subscribesAdded = false;
+	private VerticalPanel verticalPanel = new VerticalPanel();
 
-	public void onModuleLoad() {
-		SerializationServiceAsync ss = GWT.create(SerializationService.class);
-		ss.getSerializable(new Tweet(), new DefaultAsyncCallback<IsSerializable>() {
-			@Override
-			public void onSuccess(IsSerializable result) {
-				testComet();
-			}
-		});
+	private void log(String message) {
+		verticalPanel.insert(new Label(message), 1);
 	}
 
-	public void testComet() {
-		RootPanel.get().add(createTextArea());
+	public void onModuleLoad() {
+		RootPanel.get().add(verticalPanel);
+		verticalPanel.add(createTextArea());
 
-		cometClient.addConnectionListener(new CometConnectionListener() {
+		cometdClient.addConnectionListener(new CometConnectionListener() {
 			@Override
 			public void onConnected() {
 				log("You are connected");
-
-				cometClient.addSubscriber(ChannelOf.TWITTER, new CometMessageConsumer() {
-					@Override
-					public void onMessageReceived(IsSerializable message) {
-						log("--" + message);
-					}
-				}, new MessageListener<Subscription>() {
-					@Override
-					public void onMessageReceived(Subscription subscription) {
-						log(subscription._toString());
-					}
-				});
+				addSubscribers();
 			}
 
 			@Override
@@ -53,13 +40,48 @@ public class Cometd4GwtTest implements EntryPoint, CometConstants {
 			}
 		});
 
-		String url = GWT.getHostPageBaseURL() + "cometd";
-		log("Cometd Servlet Url - " + url);
+		cometdClient.addScriptLoadListener(new ScriptLoadListener() {
+			@Override
+			public void onLoad() {
+				cometdClient.addListener("/meta/*", new JsoListener<CometdMessage>() {
+					@Override
+					public void onMessageReceived(CometdMessage metaMessage) {
+						log("metaMessage=" + new JSONObject(metaMessage));
+					}
+				});
 
+				cometdClient.addListener(SERVER_VERTION_CHANNEL, new ServerVersionSyncar());
+			}
+
+			@Override
+			public void onUnload() {
+			}
+		});
+
+		String url = GWT.getHostPageBaseURL() + "cometd";
+		log("Cometd servlet's URL - " + url);
 		ConnectionConfig connectionConfig = new ConnectionConfig(url);
 		connectionConfig.requestHeaderName = "userId";
 		connectionConfig.requestHeaderValue = "123";
-		cometClient.connect(connectionConfig);
+		cometdClient.connect(connectionConfig);
+	}
+
+	private void addSubscribers() {
+		if (!subscribesAdded) {
+			subscribesAdded = true;
+
+			cometdClient.addSubscriber(ChannelOf.TWITTER, new CometMessageConsumer() {
+				@Override
+				public void onMessageReceived(IsSerializable message) {
+					log("--" + message);
+				}
+			}, new JsoListener<Subscription>() {
+				@Override
+				public void onMessageReceived(Subscription subscription) {
+					log(subscription._toString());
+				}
+			});
+		}
 	}
 
 	private Widget createTextArea() {
@@ -80,9 +102,5 @@ public class Cometd4GwtTest implements EntryPoint, CometConstants {
 		});
 
 		return textArea;
-	}
-
-	private static void log(String message) {
-		RootPanel.get().add(new Label(message));
 	}
 }

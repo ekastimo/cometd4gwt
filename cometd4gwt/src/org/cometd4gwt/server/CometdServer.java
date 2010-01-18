@@ -12,12 +12,12 @@ import org.cometd.Channel;
 import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.server.BayeuxService;
-import org.cometd4gwt.client.CometConstants;
+import org.cometd4gwt.client.CometdConstants;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class CometdServer extends BayeuxService implements CometConstants {
-	public static final String ATTRIBUTE = "org.cometd4gwt.CometServer";
+public class CometdServer extends BayeuxService implements CometdConstants {
+	public static final String ATTRIBUTE = "org.cometd4gwt.CometdServer";
 
 	private List<ClientConnectionListener> clientConnectionListeners = new ArrayList<ClientConnectionListener>();
 	private Set<String> connectedClientIds = new HashSet<String>(); //Collections.synchronizedSet();
@@ -38,7 +38,7 @@ public class CometdServer extends BayeuxService implements CometConstants {
 	public void onConnect(Client client, Message message) {
 		// This is a rocket
 		if (ServerSerializer.isSerializationPolicyNull()) {
-			client.deliver(getClient(), SERIALIZATION_POLICY_GENERATE_REQUEST, new HashMap<String, Object>(), null);
+			client.deliver(getClient(), GENERATE_SERIALIZATION_POLICY_REQUEST, new HashMap<String, Object>(), null);
 			System.err.println("serializationPolicy=null");
 		}
 

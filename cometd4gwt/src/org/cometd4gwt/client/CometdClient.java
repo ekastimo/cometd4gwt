@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class CometdClient implements CometdConstants {
@@ -14,7 +13,8 @@ public class CometdClient implements CometdConstants {
 	private List<CometConnectionListener> connectionListeners = new ArrayList<CometConnectionListener>();
 	private SubscriptionListener subscriptionListeners = new SubscriptionListener();
 
-	private boolean isScriptLoaded = false;
+	private String clientId;
+
 	private boolean wasConnected = false;
 	private CometdJsni cometd = new CometdJsni();
 
@@ -27,27 +27,9 @@ public class CometdClient implements CometdConstants {
 
 			@Override
 			public void onUnload() {
-				disconnect();
+				cometd.disconnectSync(GWT.getHostPageBaseURL() + "initializer?clientId=" + clientId);
 			}
 		});
-
-//		cometd.init();
-//		cometd.addScriptLoadListener(new ScriptLoadListener() {
-//
-//			@Override
-//			public void onLoad() {
-//				for (ScriptLoadListener l : scriptLoadListeners) {
-//					l.onLoad();
-//				}
-//			}
-//
-//			@Override
-//			public void onUnload() {
-//				for (ScriptLoadListener l : scriptLoadListeners) {
-//					l.onUnload();
-//				}
-//			}
-//		});
 	}
 
 	public JavaScriptObject addSubscriber(String channel, CometMessageConsumer consumer) {
@@ -91,9 +73,9 @@ public class CometdClient implements CometdConstants {
 		cometd.publish(channel, serializedString);
 	};
 
-	public void disconnect() {
+	public void disconnectAsync() {
 		if (isConnected()) {
-			cometd.disconnect();
+			cometd.disconnectAsync();
 		} else {
 			System.err.println("not connected");
 		}
@@ -116,20 +98,25 @@ public class CometdClient implements CometdConstants {
 				}
 			}
 		});
-
-//		cometd.connect(config);
 	}
 
 	public void addSubscriptionListeners() {
 		addListener(GENERATE_SERIALIZATION_POLICY_REQUEST, new JsoListener<CometdMessage>() {
 			@Override
 			public void onMessageReceived(CometdMessage javaScriptObject) {
-				SerializationServiceAsync ss = GWT.create(SerializationService.class);
-				ss.getSerializable(null, new DefaultAsyncCallback<IsSerializable>());
+				MetaServiceAsync serializationService = GWT.create(MetaService.class);
+				serializationService.getSerializable(null, new DefaultAsyncCallback<IsSerializable>());
 			}
 		});
 
 		addListener("/meta/subscribe", subscriptionListeners);
+
+		addListener("/meta/handshake", new JsoListener<Handshake>() {
+			@Override
+			public void onMessageReceived(Handshake handshake) {
+				clientId = handshake.getClientId();
+			}
+		});
 
 		addListener("/meta/connect", new JsoListener<CometdConnectionMessage>() {
 			@Override
@@ -149,7 +136,6 @@ public class CometdClient implements CometdConstants {
 		addListener("/meta/disconnect", new JsoListener<CometdConnectionMessage>() {
 			@Override
 			public void onMessageReceived(CometdConnectionMessage connectMessage) {
-				System.err.println("DISconnect: " + new JSONObject(connectMessage));
 				wasConnected = false;
 				onDisconnected();
 			}

@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.SerializationStreamFactory;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 
 public class ClientSerializer {
-	private static SerializationStreamFactory ssf = GWT.create(SerializationService.class);
+	private static SerializationStreamFactory ssf = GWT.create(MetaService.class);
 
 	public static IsSerializable toObject(String serializedString) {
 		try {

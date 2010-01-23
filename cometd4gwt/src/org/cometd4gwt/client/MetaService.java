@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-@RemoteServiceRelativePath("serializationService")
-public interface SerializationService extends RemoteService {
+@RemoteServiceRelativePath("metaService")
+public interface MetaService extends RemoteService {
 	IsSerializable getSerializable(IsSerializable isSerializable);
 }

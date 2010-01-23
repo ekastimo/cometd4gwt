@@ -11,6 +11,7 @@ import org.cometd.Bayeux;
 import org.cometd.Channel;
 import org.cometd.Client;
 import org.cometd.Message;
+import org.cometd.RemoveListener;
 import org.cometd.server.BayeuxService;
 import org.cometd4gwt.client.CometdConstants;
 
@@ -25,17 +26,17 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	public CometdServer(Bayeux bayeux) {
 		super(bayeux, "");
 
-		subscribe("/meta/connect", "onConnect");
-		subscribe("/meta/disconnect", "onDisconnect");
+		subscribe("/meta/connect", "onConnectMessage");
+		subscribe("/meta/disconnect", "onDisconnectMessage");
 
-		// subscribe("/meta/*", "test");
+//		subscribe("/meta/*", "test");
 	}
 
 	public void test(Client client, Message message) {
-		System.err.println("smeta-message: " + message);
+		System.err.println("server-meta-message: " + message);
 	}
 
-	public void onConnect(Client client, Message message) {
+	public void onConnectMessage(final Client client, Message message) {
 		// This is a rocket
 		if (ServerSerializer.isSerializationPolicyNull()) {
 			client.deliver(getClient(), GENERATE_SERIALIZATION_POLICY_REQUEST, new HashMap<String, Object>(), null);
@@ -47,6 +48,16 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 			synchronized (connectedClientIds) {
 				if (!connectedClientIds.contains(client.getId())) {
 					connectedClientIds.add(client.getId());
+
+					final String header = getBayeux().getCurrentRequest().getHeader("requestHeader");
+					client.addListener(new RemoveListener() {
+						@Override
+						public void removed(String clientId, boolean timeout) {
+							System.out.println("client.removed(" + clientId + ", " + timeout + ")");
+							onDisconnect(client, header);
+						}
+					});
+
 					for (ClientConnectionListener ccl : clientConnectionListeners) {
 						ccl.onConnect(client, getBayeux().getCurrentRequest());
 					}
@@ -55,11 +66,25 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 		}
 	}
 
-	public void onDisconnect(Client client, Message message) {
-		synchronized (connectedClientIds) {
-			if (connectedClientIds.remove(client.getId())) {
-				for (ClientConnectionListener ccl : clientConnectionListeners) {
-					ccl.onDisconnect(client, getBayeux().getCurrentRequest());
+	public void onDisconnectMessage(Client client, Message message) {
+		if (connectedClientIds.contains(client.getId())) {
+			synchronized (connectedClientIds) {
+				if (connectedClientIds.remove(client.getId())) {
+					for (ClientConnectionListener ccl : clientConnectionListeners) {
+						ccl.onDisconnect(client, getBayeux().getCurrentRequest());
+					}
+				}
+			}
+		}
+	}
+
+	public void onDisconnect(Client client, String requestHeader) {
+		if (connectedClientIds.contains(client.getId())) {
+			synchronized (connectedClientIds) {
+				if (connectedClientIds.remove(client.getId())) {
+					for (ClientConnectionListener ccl : clientConnectionListeners) {
+						ccl.onDisconnect(client, requestHeader);
+					}
 				}
 			}
 		}
@@ -69,7 +94,7 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 		clientConnectionListeners.add(listener);
 	}
 
-	public void publish(String channelId, IsSerializable message) {
+	public boolean publish(String channelId, IsSerializable message) {
 		Channel channel = getBayeux().getChannel(channelId, true);
 
 		if (channel == null) {
@@ -78,16 +103,21 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 		} else {
 			channel.publish(null, toMap(message), null);
 		}
+
+		return channel != null;
 	}
 
-	public void publish(String channelId, IsSerializable message, String clientId) {
+	public boolean publish(String channelId, IsSerializable message, String clientId) {
 		Client client = getBayeux().getClient(clientId);
+
 		if (client == null) {
 			System.err.println("WARNNING: getBayeux().getClient(" + clientId + ")=null, channelId=" + message
 					+ ", message=" + message);
 		} else {
 			client.deliver(null, channelId, toMap(message), null);
 		}
+
+		return client != null;
 	}
 
 	private final Map<String, Object> toMap(IsSerializable message) {
@@ -110,27 +140,12 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 		return false;
 	}
 
-//	public void setChannelPersistent(String channelId, boolean persistent) {
-//		getBayeux().getChannel(channelId, true).setPersistent(persistent);
-//	}
-//	
-//	private void unsubscribeChannel(String channelId, String clientId) {
-//		Channel channel = getBayeux().getChannel(channelId, false);
-//		if (channel != null) {
-//			Client client = getBayeux().getClient(clientId);
-//			if (client != null) {
-//				channel.unsubscribe(client);
-//			}
-//		}
-//	}
-//
-//	private void subscribeChannel(String channelId, String clientId) {
-//		Channel channel = getBayeux().getChannel(channelId, false);
-//		if (channel != null) {
-//			Client client = getBayeux().getClient(clientId);
-//			if (client != null) {
-//				channel.subscribe(client);
-//			}
-//		}
-//	}
+	public void diconnect(String clientId) {
+		Client client = getBayeux().getClient(clientId);
+		System.out.println("cometdServer.disconnect(clientId=" + clientId + ", client=" + client + ")");
+
+		if (client != null) {
+			client.disconnect();
+		}
+	}
 }

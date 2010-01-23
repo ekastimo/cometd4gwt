@@ -2,22 +2,30 @@ package org.cometd4gwt.server;
 
 import java.io.IOException;
 
-import javax.servlet.GenericServlet;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.cometd.Bayeux;
 
 @SuppressWarnings("serial")
-public class BayeuxInitializer extends GenericServlet {
+public class BayeuxInitializer extends HttpServlet {
+
+	private CometdServer cometdServer;
 
 	public void init() throws ServletException {
 		Bayeux bayeux = (Bayeux) getServletContext().getAttribute(Bayeux.ATTRIBUTE);
-		getServletContext().setAttribute(CometdServer.ATTRIBUTE, new CometdServer(bayeux));
+		getServletContext().setAttribute(CometdServer.ATTRIBUTE, cometdServer = new CometdServer(bayeux));
 	}
 
-	public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
-		throw new ServletException();
+	@Override
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException {
+		String clientId = request.getParameter("clientId");
+		System.err.println("request.getParameter(clientId)=" + clientId);
+		if (clientId != null) {
+			cometdServer.diconnect(clientId);
+		}
 	}
 }

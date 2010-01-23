@@ -1,9 +1,8 @@
 package org.cometd4gwt.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class DefaultAsyncCallback<T> implements AsyncCallback<IsSerializable> {
+public class DefaultAsyncCallback<T> implements AsyncCallback<T> {
 
 	@Override
 	public void onFailure(Throwable caught) {
@@ -12,7 +11,7 @@ public class DefaultAsyncCallback<T> implements AsyncCallback<IsSerializable> {
 	}
 
 	@Override
-	public void onSuccess(IsSerializable result) {
+	public void onSuccess(T result) {
 		// TODO Auto-generated method stub
 
 	}

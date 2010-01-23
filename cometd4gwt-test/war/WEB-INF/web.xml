@@ -36,14 +36,19 @@
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 
+	<servlet-mapping>
+		<servlet-name>initializer</servlet-name>
+		<url-pattern>/initializer</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
-		<servlet-name>serializationService</servlet-name>
-		<servlet-class>org.cometd4gwt.server.SerializationServiceImpl</servlet-class>
+		<servlet-name>metaService</servlet-name>
+		<servlet-class>org.cometd4gwt.server.MetaServiceImpl</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>serializationService</servlet-name>
-		<url-pattern>/Cometd4GwtTest/serializationService</url-pattern>
+		<servlet-name>metaService</servlet-name>
+		<url-pattern>/Cometd4GwtTest/metaService</url-pattern>
 	</servlet-mapping>
 
 	<!-- Test Servlet -->
@@ -56,6 +61,16 @@
 	<servlet-mapping>
 		<servlet-name>twitterServlet</servlet-name>
 		<url-pattern>/Cometd4GwtTest/twitter</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<description></description>
+		<servlet-name>Dumper</servlet-name>
+		<servlet-class>org.cometd4gwt.server.Dumper</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Dumper</servlet-name>
+		<url-pattern>/dump</url-pattern>
 	</servlet-mapping>
 
 </web-app>

@@ -50,6 +50,11 @@ public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterS
 					return "[client=" + client + ", requestHeader=" + request.getHeader("requestHeader") + "]";
 				}
 			}
+
+			@Override
+			public void onDisconnect(Client client, String requestHeader) {
+				publishTweet(new Tweet(new Date(), client + " is ofline, no message on /meta/disconnect"));
+			}
 		});
 	}
 

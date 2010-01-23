@@ -8,7 +8,6 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -64,7 +63,7 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 		log("Cometd servlet's URL - " + url);
 		ConnectionConfig connectionConfig = new ConnectionConfig(url);
 		connectionConfig.requestHeaderName = "userId";
-		connectionConfig.requestHeaderValue = "123";
+		connectionConfig.requestHeaderValue = "" + ((int) (Math.random() * 1000));
 		cometdClient.connect(connectionConfig);
 	}
 
@@ -72,26 +71,28 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 		if (!subscribesAdded) {
 			subscribesAdded = true;
 
-			final JavaScriptObject subscription = cometdClient.addSubscriber(ChannelOf.TWITTER, new CometMessageConsumer() {
-				@Override
-				public void onMessageReceived(IsSerializable message) {
-					log("--" + message);
-				}
-			}, new JsoListener<Subscription>() {
-				@Override
-				public void onMessageReceived(Subscription subscription) {
-					log(subscription._toString());
-				}
-			});
+			final JavaScriptObject subscription = cometdClient.addSubscriber(ChannelOf.TWITTER,
+					new CometMessageConsumer() {
+						@Override
+						public void onMessageReceived(IsSerializable message) {
+							log("--" + message);
+						}
+					}, new JsoListener<Subscription>() {
+						@Override
+						public void onMessageReceived(Subscription subscription) {
+							log(subscription._toString());
+						}
+					});
 
 			log("subscription=" + new JSONObject(subscription));
-			
-			new Timer() {
-				@Override
-				public void run() {
-					cometdClient.unsubscribe(subscription);
-				}
-			}.schedule(5000);
+
+//			new Timer() {
+//				@Override
+//				public void run() {
+//					cometdClient.unsubscribe(subscription);
+//					cometdClient.disconnect();
+//				}
+//			}.schedule(5000);
 		}
 	}
 

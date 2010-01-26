@@ -3,7 +3,7 @@ package org.cometd4gwt.client;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SubscriptionListener implements JsoListener<Subscription> {
+public class SubscriptionListeners implements JsoListener<Subscription> {
 
 	private Map<String, JsoListener<Subscription>> disposableReceivers = new HashMap<String, JsoListener<Subscription>>();
 

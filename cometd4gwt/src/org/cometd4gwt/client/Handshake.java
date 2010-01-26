@@ -1,6 +1,6 @@
 package org.cometd4gwt.client;
 
-public class Handshake extends CometdMessage {
+public class Handshake extends CometdJso {
 	protected Handshake() {
 	}
 

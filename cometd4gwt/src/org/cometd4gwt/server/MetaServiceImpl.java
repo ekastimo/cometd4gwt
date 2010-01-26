@@ -21,8 +21,8 @@ public class MetaServiceImpl extends OpenRemoteServiceServlet implements MetaSer
 	public SerializationPolicy getSerializationPolicy(String moduleBaseURL, String strongName) {
 		SerializationPolicy serializationPolicy = super.getSerializationPolicy(moduleBaseURL, strongName);
 
-		if (ServerSerializer.isSerializationPolicyNull()) {
-			ServerSerializer.setSerializationPolicy(serializationPolicy);
+		if (Serializer.isSerializationPolicyNull()) {
+			Serializer.setSerializationPolicy(serializationPolicy);
 		}
 
 		return serializationPolicy;
@@ -31,5 +31,15 @@ public class MetaServiceImpl extends OpenRemoteServiceServlet implements MetaSer
 	@Override
 	public IsSerializable getSerializable(IsSerializable isSerializable) {
 		return isSerializable;
+	}
+
+	@Override
+	public void publish(String channelId, IsSerializable message) {
+		cometServer.publish(channelId, message);
+	}
+
+	@Override
+	public void publish(String channelId, IsSerializable message, String clientId) {
+		cometServer.publish(channelId, message, clientId);
 	}
 }

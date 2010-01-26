@@ -1,6 +1,6 @@
 package org.cometd4gwt.client;
 
-public class Subscription extends CometdMessage {
+public class Subscription extends CometdJso {
 	protected Subscription() {
 	}
 

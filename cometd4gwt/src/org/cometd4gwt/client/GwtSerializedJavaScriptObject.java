@@ -12,6 +12,6 @@ public class GwtSerializedJavaScriptObject extends JavaScriptObject {
 	}-*/;
 
 	public final IsSerializable getObject() {
-		return ClientSerializer.toObject(getSerializedString());
+		return Deserializer.toObject(getSerializedString());
 	}
 }

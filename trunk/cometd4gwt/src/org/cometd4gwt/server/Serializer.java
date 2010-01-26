@@ -7,11 +7,9 @@ import org.cometd4gwt.client.MetaService;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.server.rpc.RPC;
-import com.google.gwt.user.server.rpc.RPCRequest;
 import com.google.gwt.user.server.rpc.SerializationPolicy;
-import com.google.gwt.user.server.rpc.SerializationPolicyProvider;
 
-public class ServerSerializer {
+public class Serializer {
 
 	private static SerializationPolicy serializationPolicy = null;
 
@@ -31,7 +29,7 @@ public class ServerSerializer {
 	}
 
 	public static void setSerializationPolicy(SerializationPolicy serializationPolicy) {
-		ServerSerializer.serializationPolicy = serializationPolicy;
+		Serializer.serializationPolicy = serializationPolicy;
 	}
 
 	public static boolean isSerializationPolicyNull() {

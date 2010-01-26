@@ -44,9 +44,9 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 		cometdClient.addScriptLoadListener(new ScriptLoadListener() {
 			@Override
 			public void onLoad() {
-				cometdClient.addListener("/meta/*", new JsoListener<CometdMessage>() {
+				cometdClient.addListener("/meta/*", new JsoListener<CometdJso>() {
 					@Override
-					public void onMessageReceived(CometdMessage metaMessage) {
+					public void onMessageReceived(CometdJso metaMessage) {
 						log("metaMessage=" + new JSONObject(metaMessage));
 					}
 				});
@@ -59,9 +59,9 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 			}
 		});
 
-		String url = GWT.getHostPageBaseURL() + "cometd";
-		log("Cometd servlet's URL - " + url);
-		ConnectionConfig connectionConfig = new ConnectionConfig(url);
+		String cometdServletUrl = GWT.getHostPageBaseURL() + "cometd";
+		log("Cometd servlet's URL - " + cometdServletUrl);
+		ConnectionConfig connectionConfig = new ConnectionConfig(cometdServletUrl);
 		connectionConfig.requestHeaderName = "userId";
 		connectionConfig.requestHeaderValue = "" + ((int) (Math.random() * 1000));
 		cometdClient.connect(connectionConfig);

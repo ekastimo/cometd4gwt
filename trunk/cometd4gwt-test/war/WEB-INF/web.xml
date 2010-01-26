@@ -48,7 +48,7 @@
 
 	<servlet-mapping>
 		<servlet-name>metaService</servlet-name>
-		<url-pattern>/Cometd4GwtTest/metaService</url-pattern>
+		<url-pattern>Cometd4GwtTest/metaService</url-pattern>
 	</servlet-mapping>
 
 	<!-- Test Servlet -->

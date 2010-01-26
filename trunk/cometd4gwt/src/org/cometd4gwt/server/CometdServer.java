@@ -38,7 +38,7 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 
 	public void onConnectMessage(final Client client, Message message) {
 		// This is a rocket
-		if (ServerSerializer.isSerializationPolicyNull()) {
+		if (Serializer.isSerializationPolicyNull()) {
 			client.deliver(getClient(), GENERATE_SERIALIZATION_POLICY_REQUEST, new HashMap<String, Object>(), null);
 			System.err.println("serializationPolicy=null");
 		}
@@ -122,7 +122,7 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 
 	private final Map<String, Object> toMap(IsSerializable message) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(SERIALIZED_STRING, ServerSerializer.toString(message));
+		map.put(SERIALIZED_STRING, Serializer.toString(message));
 
 		return map;
 	}

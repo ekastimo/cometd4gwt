@@ -2,8 +2,8 @@ package org.cometd4gwt.client;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class CometdMessage extends JavaScriptObject {
-	protected CometdMessage() {
+public class CometdJso extends JavaScriptObject {
+	protected CometdJso() {
 	}
 
 	public final int getId() {

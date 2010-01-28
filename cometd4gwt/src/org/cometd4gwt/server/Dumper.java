@@ -40,7 +40,7 @@ public class Dumper extends HttpServlet {
 
 		buf.append("\n" + bayeux.getClients().size() + " channels - ");
 		for (Channel c : bayeux.getChannels()) {
-			buf.append(", " + c + " (" + c.getSubscribers() + ")");
+			buf.append("\n" + c + " (" + c.getSubscribers() + ")");
 
 		}
 

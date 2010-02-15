@@ -120,6 +120,10 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 		return client != null;
 	}
 
+	public void addConsumer() {
+
+	}
+
 	private final Map<String, Object> toMap(IsSerializable message) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put(SERIALIZED_STRING, Serializer.toString(message));

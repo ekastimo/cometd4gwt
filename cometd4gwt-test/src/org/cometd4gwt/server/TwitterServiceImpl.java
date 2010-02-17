@@ -9,10 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.cometd.Client;
 import org.cometd4gwt.client.ChannelOf;
+import org.cometd4gwt.client.CometMessageConsumer;
 import org.cometd4gwt.client.Tweet;
 import org.cometd4gwt.client.TwitterConstant;
 import org.cometd4gwt.client.TwitterService;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 @SuppressWarnings("serial")
@@ -54,6 +56,13 @@ public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterS
 			@Override
 			public void onDisconnect(Client client, String requestHeader) {
 				publishTweet(new Tweet(new Date(), client + " is ofline, no message on /meta/disconnect"));
+			}
+		});
+
+		cometServer.subscribeChannel(ChannelOf.TWITTER, new CometMessageConsumer() {
+			@Override
+			public void onMessageReceived(IsSerializable message) {
+				System.err.println("message on the server side: " + message);
 			}
 		});
 	}

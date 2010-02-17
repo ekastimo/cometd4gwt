@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.cometd.Bayeux;
@@ -13,6 +12,7 @@ import org.cometd.Client;
 import org.cometd.Message;
 import org.cometd.RemoveListener;
 import org.cometd.server.BayeuxService;
+import org.cometd4gwt.client.CometMessageConsumer;
 import org.cometd4gwt.client.CometdConstants;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -101,7 +101,7 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 			System.err.println("WARNNING: getBayeux().getChannel(" + channelId + ", true)=null, channelId=" + message
 					+ ", message=" + message);
 		} else {
-			channel.publish(null, toMap(message), null);
+			channel.publish(null, new JsonMap(message), null);
 		}
 
 		return channel != null;
@@ -114,21 +114,13 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 			System.err.println("WARNNING: getBayeux().getClient(" + clientId + ")=null, channelId=" + message
 					+ ", message=" + message);
 		} else {
-			client.deliver(null, channelId, toMap(message), null);
+			client.deliver(null, channelId, new JsonMap(message), null);
+
+//			Client client2 = getBayeux().getClient(channelId + SUFFIX);
+//			client2.deliver(null, channelId, new JsonMap(MESSAGE_OBJECT, message), null);
 		}
 
 		return client != null;
-	}
-
-	public void addConsumer() {
-
-	}
-
-	private final Map<String, Object> toMap(IsSerializable message) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(SERIALIZED_STRING, Serializer.toString(message));
-
-		return map;
 	}
 
 	public boolean isSubscribed(String channelId, String clientId) {
@@ -150,6 +142,17 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 
 		if (client != null) {
 			client.disconnect();
+		}
+	}
+
+	public void subscribeChannel(String channelId, CometMessageConsumer consumer) {
+		new BayeuxSubscriber(getBayeux(), channelId, consumer);
+	}
+
+	public void removeChannel(String channelId) {
+		Channel channel = getBayeux().getChannel(channelId, false);
+		if (channel != null) {
+			channel.remove();
 		}
 	}
 }

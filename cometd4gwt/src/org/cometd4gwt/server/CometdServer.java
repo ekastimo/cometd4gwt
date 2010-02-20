@@ -110,14 +110,13 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	public boolean publish(String channelId, IsSerializable message, String clientId) {
 		Client client = getBayeux().getClient(clientId);
 
+		System.err.println("publish(" + channelId + ", " + message + ", " + clientId + "), client=" + client);
+
 		if (client == null) {
 			System.err.println("WARNNING: getBayeux().getClient(" + clientId + ")=null, channelId=" + message
 					+ ", message=" + message);
 		} else {
 			client.deliver(null, channelId, new JsonMap(message), null);
-
-//			Client client2 = getBayeux().getClient(channelId + SUFFIX);
-//			client2.deliver(null, channelId, new JsonMap(MESSAGE_OBJECT, message), null);
 		}
 
 		return client != null;
@@ -146,6 +145,8 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	}
 
 	public void subscribeChannel(String channelId, CometMessageConsumer consumer) {
+		System.err.println("subscribing channel=" + channelId);
+		getBayeux().getChannel(channelId, true);
 		new BayeuxSubscriber(getBayeux(), channelId, consumer);
 	}
 

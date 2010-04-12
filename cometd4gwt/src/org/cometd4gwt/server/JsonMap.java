@@ -6,7 +6,9 @@ import org.cometd4gwt.client.CometdConstants;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+@SuppressWarnings("serial")
 public class JsonMap extends HashMap<String, Object> implements CometdConstants {
+	
 	public JsonMap(IsSerializable message) {
 		put(SERIALIZED_STRING, Serializer.toString(message));
 		put(OBJECT_MESSAGE, message);

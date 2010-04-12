@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.cometd.Bayeux;
@@ -22,6 +23,7 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 
 	private List<ClientConnectionListener> clientConnectionListeners = new ArrayList<ClientConnectionListener>();
 	private Set<String> connectedClientIds = new HashSet<String>(); //Collections.synchronizedSet();
+	private Map<String, Client> clients = new HashMap<String, Client>();
 
 	public CometdServer(Bayeux bayeux) {
 		super(bayeux, "");
@@ -49,20 +51,27 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 				if (!connectedClientIds.contains(client.getId())) {
 					connectedClientIds.add(client.getId());
 
-					final String header = getBayeux().getCurrentRequest().getHeader("requestHeader");
+					final String userId = getBayeux().getCurrentRequest().getHeader("requestHeader");
 					client.addListener(new RemoveListener() {
 						@Override
 						public void removed(String clientId, boolean timeout) {
 							System.out.println("client.removed(" + clientId + ", " + timeout + ")");
-							onDisconnect(client, header);
+							onDisconnect(client, userId);
 						}
 					});
 
 					for (ClientConnectionListener ccl : clientConnectionListeners) {
-						ccl.onConnect(client, getBayeux().getCurrentRequest());
+						ccl.onConnect(client, userId);
 					}
 				}
 			}
+		}
+	}
+
+	public void addClient(Client client, String userId) {
+		clients.put(client.getId(), client);
+		for (ClientConnectionListener ccl : clientConnectionListeners) {
+			ccl.onConnect(client, userId);
 		}
 	}
 
@@ -71,7 +80,8 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 			synchronized (connectedClientIds) {
 				if (connectedClientIds.remove(client.getId())) {
 					for (ClientConnectionListener ccl : clientConnectionListeners) {
-						ccl.onDisconnect(client, getBayeux().getCurrentRequest());
+						final String userId = getBayeux().getCurrentRequest().getHeader("requestHeader");
+						ccl.onDisconnect(client, userId);
 					}
 				}
 			}
@@ -107,13 +117,19 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 		return channel != null;
 	}
 
-	public boolean publish(String channelId, IsSerializable message, String clientId) {
+	private Client getClient(String clientId) {
 		Client client = getBayeux().getClient(clientId);
+		return client == null ? clients.get(clientId) : client;
+	}
 
-		System.err.println("publish(" + channelId + ", " + message + ", " + clientId + "), client=" + client);
+	public boolean publish(String channelId, IsSerializable message, String clientId) {
+//		Client client = getBayeux().getClient(clientId);
+		Client client = getClient(clientId);
+
+		System.err.println(this + "-publish(" + channelId + ", " + message + ", " + clientId + "), client=" + client);
 
 		if (client == null) {
-			System.err.println("WARNNING: getBayeux().getClient(" + clientId + ")=null, channelId=" + message
+			System.err.println(this + "-WARNNING: getBayeux().getClient(" + clientId + ")=null, channelId=" + message
 					+ ", message=" + message);
 		} else {
 			client.deliver(null, channelId, new JsonMap(message), null);
@@ -136,7 +152,9 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	}
 
 	public void diconnect(String clientId) {
-		Client client = getBayeux().getClient(clientId);
+//		Client client = getBayeux().getClient(clientId);
+		Client client = getClient(clientId);
+		
 		System.out.println("cometdServer.disconnect(clientId=" + clientId + ", client=" + client + ")");
 
 		if (client != null) {
@@ -145,7 +163,7 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	}
 
 	public void subscribeChannel(String channelId, CometMessageConsumer consumer) {
-		System.err.println("subscribing channel=" + channelId);
+		System.out.println("subscribing channel=" + channelId);
 		getBayeux().getChannel(channelId, true);
 		new BayeuxSubscriber(getBayeux(), channelId, consumer);
 	}

@@ -35,22 +35,13 @@ public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterS
 		cometServer.addClientConnectionListener(new ClientConnectionListener() {
 
 			@Override
-			public void onConnect(Client client, HttpServletRequest request) {
-				client.deliver(client, SERVER_VERTION_CHANNEL, getServerVertion(), null);
+			public void onConnect(Client client, String request) {
+				client.deliver(client, SERVER_VERSION_CHANNEL, getServerVertion(), null);
 				publishTweet(new Tweet(new Date(), toString(client, request) + " has came online"));
 			}
 
-			@Override
-			public void onDisconnect(Client client, HttpServletRequest request) {
-				publishTweet(new Tweet(new Date(), toString(client, request) + " is ofline"));
-			}
-
-			private String toString(Client client, HttpServletRequest request) {
-				if (request == null) {
-					return "[client=" + client + ", request=null]";
-				} else {
-					return "[client=" + client + ", requestHeader=" + request.getHeader("requestHeader") + "]";
-				}
+			private String toString(Client client, String userId) {
+				return "[client=" + client + ", userId=" + userId + "]";
 			}
 
 			@Override

@@ -51,7 +51,7 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 					}
 				});
 
-				cometdClient.addListener(SERVER_VERTION_CHANNEL, new ServerVersionSyncar());
+				cometdClient.addListener(SERVER_VERSION_CHANNEL, new ServerVersionSyncar());
 			}
 
 			@Override

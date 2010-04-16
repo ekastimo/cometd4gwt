@@ -4,5 +4,5 @@
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.google.gwt.json.JSON" />
 	<public path="public"/>
-	<script src="dojo/dojo.js"/>
+	<script src="dojo/dojo.js" />
 </module>

@@ -22,8 +22,8 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	public static final String ATTRIBUTE = "org.cometd4gwt.CometdServer";
 
 	private List<ClientConnectionListener> clientConnectionListeners = new ArrayList<ClientConnectionListener>();
-	private Set<String> connectedClientIds = new HashSet<String>(); //Collections.synchronizedSet();
 	private Map<String, Client> clients = new HashMap<String, Client>();
+	private Set<String> connectedClientIds = new HashSet<String>(); //Collections.synchronizedSet();
 
 	public CometdServer(Bayeux bayeux) {
 		super(bayeux, "");
@@ -126,7 +126,7 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 //		Client client = getBayeux().getClient(clientId);
 		Client client = getClient(clientId);
 
-		System.err.println(this + "-publish(" + channelId + ", " + message + ", " + clientId + "), client=" + client);
+//		System.err.println(this + "-publish(" + channelId + ", " + message + ", " + clientId + "), client=" + client);
 
 		if (client == null) {
 			System.err.println(this + "-WARNNING: getBayeux().getClient(" + clientId + ")=null, channelId=" + message

@@ -1,6 +1,7 @@
 package org.cometd4gwt.server;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,8 +23,9 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	public static final String ATTRIBUTE = "org.cometd4gwt.CometdServer";
 
 	private List<ClientConnectionListener> clientConnectionListeners = new ArrayList<ClientConnectionListener>();
+
+	private Set<String> connectedClientIds = Collections.synchronizedSet(new HashSet<String>());
 	private Map<String, Client> clients = new HashMap<String, Client>();
-	private Set<String> connectedClientIds = new HashSet<String>(); //Collections.synchronizedSet();
 
 	public CometdServer(Bayeux bayeux) {
 		super(bayeux, "");
@@ -47,24 +49,28 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 
 		//  
 		else if (!connectedClientIds.contains(client.getId())) {
-			synchronized (connectedClientIds) {
-				if (!connectedClientIds.contains(client.getId())) {
-					connectedClientIds.add(client.getId());
+//			synchronized (connectedClientIds) {
+//				if (!connectedClientIds.contains(client.getId())) {
+			connectedClientIds.add(client.getId());
 
-					final String userId = getBayeux().getCurrentRequest().getHeader("requestHeader");
-					client.addListener(new RemoveListener() {
-						@Override
-						public void removed(String clientId, boolean timeout) {
-							System.out.println("client.removed(" + clientId + ", " + timeout + ")");
-							onDisconnect(client, userId);
-						}
-					});
+			final String userId = getBayeux().getCurrentRequest().getHeader("requestHeader");
 
-					for (ClientConnectionListener ccl : clientConnectionListeners) {
-						ccl.onConnect(client, userId);
-					}
+			// On disconnect clear the resources
+			client.addListener(new RemoveListener() {
+				@Override
+				public void removed(String clientId, boolean timeout) {
+//					System.out.println("client.removed(" + clientId + ", " + timeout + ")");
+					onDisconnect(client, userId);
 				}
+			});
+
+			// Fire events
+			for (ClientConnectionListener ccl : clientConnectionListeners) {
+				ccl.onConnect(client, userId);
 			}
+
+//				}
+//			}
 		}
 	}
 
@@ -76,28 +82,28 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	}
 
 	public void onDisconnectMessage(Client client, Message message) {
-		if (connectedClientIds.contains(client.getId())) {
-			synchronized (connectedClientIds) {
-				if (connectedClientIds.remove(client.getId())) {
-					for (ClientConnectionListener ccl : clientConnectionListeners) {
-						final String userId = getBayeux().getCurrentRequest().getHeader("requestHeader");
-						ccl.onDisconnect(client, userId);
-					}
-				}
+//		if (connectedClientIds.contains(client.getId())) {
+//			synchronized (connectedClientIds) {
+		if (connectedClientIds.remove(client.getId())) {
+			for (ClientConnectionListener ccl : clientConnectionListeners) {
+				final String userId = getBayeux().getCurrentRequest().getHeader("requestHeader");
+				ccl.onDisconnect(client, userId);
 			}
 		}
+//			}
+//		}
 	}
 
 	public void onDisconnect(Client client, String requestHeader) {
-		if (connectedClientIds.contains(client.getId())) {
-			synchronized (connectedClientIds) {
-				if (connectedClientIds.remove(client.getId())) {
-					for (ClientConnectionListener ccl : clientConnectionListeners) {
-						ccl.onDisconnect(client, requestHeader);
-					}
-				}
+//		if (connectedClientIds.contains(client.getId())) {
+//			synchronized (connectedClientIds) {
+		if (connectedClientIds.remove(client.getId())) {
+			for (ClientConnectionListener ccl : clientConnectionListeners) {
+				ccl.onDisconnect(client, requestHeader);
 			}
 		}
+//			}
+//		}
 	}
 
 	public void addClientConnectionListener(ClientConnectionListener listener) {
@@ -154,7 +160,7 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 	public void diconnect(String clientId) {
 //		Client client = getBayeux().getClient(clientId);
 		Client client = getClient(clientId);
-		
+
 		System.out.println("cometdServer.disconnect(clientId=" + clientId + ", client=" + client + ")");
 
 		if (client != null) {

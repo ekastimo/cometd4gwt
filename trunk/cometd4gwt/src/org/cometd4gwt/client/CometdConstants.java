@@ -5,4 +5,5 @@ public interface CometdConstants {
 	String OBJECT_MESSAGE = "objectMmessage";
 
 	String GENERATE_SERIALIZATION_POLICY_REQUEST = "/service/serializationPolicy";
+	String SERVER_VERSION_CHANNEL = "/service/serverVertionChannel";
 }

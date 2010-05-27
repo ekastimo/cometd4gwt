@@ -35,6 +35,7 @@ public class ServerSideClient implements Client, CometdConstants {
 		consumers.put(topic, cometMessageConsumer);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void deliver(Client from, String toChannel, Object data, String id) {
 		CometMessageConsumer cometMessageConsumer = consumers.get(toChannel);

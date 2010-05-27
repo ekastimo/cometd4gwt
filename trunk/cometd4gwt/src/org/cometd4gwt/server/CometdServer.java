@@ -1,10 +1,9 @@
 package org.cometd4gwt.server;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,88 +21,101 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class CometdServer extends BayeuxService implements CometdConstants {
 	public static final String ATTRIBUTE = "org.cometd4gwt.CometdServer";
 
-	private List<ClientConnectionListener> clientConnectionListeners = new ArrayList<ClientConnectionListener>();
+	/**
+	 * Interested party that want to be notified of user's session.
+	 */
+	private ClientConnectionListeners clientConnectionListeners = new ClientConnectionListeners();
 
+	/**
+	 * List of connected client IDs to avoid repeated event fire on reconnect on
+	 * a long-polling
+	 */
 	private Set<String> connectedClientIds = Collections.synchronizedSet(new HashSet<String>());
+
+	/**
+	 * Clients that is being added from the server side to receive message like
+	 * any other client. This clients imitate the browser side client without
+	 * any hassle of connection
+	 */
 	private Map<String, Client> clients = new HashMap<String, Client>();
+
+	/**
+	 * On any restart server will be assigned a unique ID to be synced with the
+	 * client
+	 */
+	private String serverVersion = "" + new Date().getTime();
+
+	public Map<String, Object> getServerVertion() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("version", serverVersion);
+		return map;
+	}
 
 	public CometdServer(Bayeux bayeux) {
 		super(bayeux, "");
-
 		subscribe("/meta/connect", "onConnectMessage");
-		subscribe("/meta/disconnect", "onDisconnectMessage");
-
-//		subscribe("/meta/*", "test");
 	}
 
-	public void test(Client client, Message message) {
-		System.err.println("server-meta-message: " + message);
+	public void onMetaMessage(final Client client, Message message) {
+		System.err.println("Meta Message=" + message);
 	}
 
 	public void onConnectMessage(final Client client, Message message) {
-		// This is a rocket
+
+		/**
+		 * The first client on the very first attempt to connect will receive a
+		 * request to generate the serialization policy by calling a simple
+		 * service in the MetaSerice. All other clients will use that policy to
+		 * serialize the outgoing objects
+		 */
 		if (Serializer.isSerializationPolicyNull()) {
 			client.deliver(getClient(), GENERATE_SERIALIZATION_POLICY_REQUEST, new HashMap<String, Object>(), null);
 			System.err.println("serializationPolicy=null");
 		}
 
-		//  
+		/**
+		 * We are only interested on the fist connect message. All other
+		 * subsequent messages are the result of long-polling.
+		 */
 		else if (!connectedClientIds.contains(client.getId())) {
-//			synchronized (connectedClientIds) {
-//				if (!connectedClientIds.contains(client.getId())) {
 			connectedClientIds.add(client.getId());
 
-			final String userId = getBayeux().getCurrentRequest().getHeader("requestHeader");
+			// Send client the current version, if client needs to be synced  
+			client.deliver(client, SERVER_VERSION_CHANNEL, getServerVertion(), null);
 
-			// On disconnect clear the resources
+			final String userId = getCurrentUserId();
+
+			// Ensure, on disconnect the resources will be cleared
 			client.addListener(new RemoveListener() {
 				@Override
 				public void removed(String clientId, boolean timeout) {
-//					System.out.println("client.removed(" + clientId + ", " + timeout + ")");
-					onDisconnect(client, userId);
+					if (connectedClientIds.remove(client.getId())) {
+						clientConnectionListeners.onDisconnect(client, userId);
+					}
 				}
 			});
 
 			// Fire events
-			for (ClientConnectionListener ccl : clientConnectionListeners) {
-				ccl.onConnect(client, userId);
-			}
-
-//				}
-//			}
+			clientConnectionListeners.onConnect(client, userId);
 		}
 	}
 
+	public void diconnect(String clientId) {
+		Client client = getClient(clientId);
+		if (client != null) {
+			client.disconnect();
+		}
+	}
+
+	/**
+	 * This method will be called from the server side
+	 * 
+	 * @param client
+	 * @param userId
+	 */
 	public void addClient(Client client, String userId) {
 		clients.put(client.getId(), client);
-		for (ClientConnectionListener ccl : clientConnectionListeners) {
-			ccl.onConnect(client, userId);
-		}
-	}
-
-	public void onDisconnectMessage(Client client, Message message) {
-//		if (connectedClientIds.contains(client.getId())) {
-//			synchronized (connectedClientIds) {
-		if (connectedClientIds.remove(client.getId())) {
-			for (ClientConnectionListener ccl : clientConnectionListeners) {
-				final String userId = getBayeux().getCurrentRequest().getHeader("requestHeader");
-				ccl.onDisconnect(client, userId);
-			}
-		}
-//			}
-//		}
-	}
-
-	public void onDisconnect(Client client, String requestHeader) {
-//		if (connectedClientIds.contains(client.getId())) {
-//			synchronized (connectedClientIds) {
-		if (connectedClientIds.remove(client.getId())) {
-			for (ClientConnectionListener ccl : clientConnectionListeners) {
-				ccl.onDisconnect(client, requestHeader);
-			}
-		}
-//			}
-//		}
+		clientConnectionListeners.onConnect(client, userId);
 	}
 
 	public void addClientConnectionListener(ClientConnectionListener listener) {
@@ -153,23 +165,12 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 			}
 		}
 
-		System.err.println("isSubscribed(" + channelId + ", " + clientId + ") = false");
+//		System.err.println("isSubscribed(" + channelId + ", " + clientId + ") = false");
 		return false;
 	}
 
-	public void diconnect(String clientId) {
-//		Client client = getBayeux().getClient(clientId);
-		Client client = getClient(clientId);
-
-		System.out.println("cometdServer.disconnect(clientId=" + clientId + ", client=" + client + ")");
-
-		if (client != null) {
-			client.disconnect();
-		}
-	}
-
 	public void subscribeChannel(String channelId, CometMessageConsumer consumer) {
-		System.out.println("subscribing channel=" + channelId);
+//		System.out.println("subscribing channel=" + channelId);
 		getBayeux().getChannel(channelId, true);
 		new BayeuxSubscriber(getBayeux(), channelId, consumer);
 	}
@@ -179,5 +180,9 @@ public class CometdServer extends BayeuxService implements CometdConstants {
 		if (channel != null) {
 			channel.remove();
 		}
+	}
+
+	private String getCurrentUserId() {
+		return getBayeux().getCurrentRequest().getHeader("requestHeader");
 	}
 }

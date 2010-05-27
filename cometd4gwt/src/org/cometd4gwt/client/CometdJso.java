@@ -9,7 +9,7 @@ public class CometdJso extends JavaScriptObject {
 	public final int getId() {
 		return Integer.parseInt(_getId());
 	}
-	
+
 	private final native String _getId()/*-{
 		return this.id;
 	}-*/;
@@ -20,5 +20,9 @@ public class CometdJso extends JavaScriptObject {
 
 	public final native String getChannel() /*-{
 		return this.channel;
+	}-*/;
+
+	public final native String getAction() /*-{
+		return this.action;
 	}-*/;
 }

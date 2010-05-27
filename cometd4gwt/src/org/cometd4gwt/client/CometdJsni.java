@@ -31,9 +31,9 @@ class CometdJsni {
 		$wnd.dojo.addOnLoad(function() {
 			loadListener.@org.cometd4gwt.client.ScriptLoadListener::onLoad()();
 
-		    $wnd.dojo.addOnUnload(function() {
-				loadListener.@org.cometd4gwt.client.ScriptLoadListener::onUnload()();
-		    });
+//		    $wnd.dojo.addOnUnload(function() {
+//				loadListener.@org.cometd4gwt.client.ScriptLoadListener::onUnload()();
+//		    });
 
 			// TODO - enable sending custom request header 
 			// var name = config.@org.cometd4gwt.client.ConnectionConfig::requestHeaderName;
@@ -42,6 +42,7 @@ class CometdJsni {
 		        requestHeaders: {requestHeader:value},
 		        url: config.@org.cometd4gwt.client.ConnectionConfig::url,
 		        maxConnection: config.@org.cometd4gwt.client.ConnectionConfig::maxConnection,
+		        maxNetworkDelay: config.@org.cometd4gwt.client.ConnectionConfig::maxNetworkDelay,
 		        logLevel: 'debug'
 		    });
 

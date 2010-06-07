@@ -5,6 +5,8 @@ import java.util.Date;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.json.client.JSONObject;
@@ -15,8 +17,8 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
-	final CometdClient cometdClient = new CometdClient();
+public class Cometd4GwtTest implements EntryPoint, CometdConstants {
+	final CometdClient cometdClient = new PersistentSubscribersCometdClient(new CometdClientImpl());
 	private boolean subscribesAdded = false;
 	private VerticalPanel verticalPanel = new VerticalPanel();
 
@@ -27,6 +29,20 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 	public void onModuleLoad() {
 		RootPanel.get().add(verticalPanel);
 		verticalPanel.add(createTextArea());
+
+		verticalPanel.add(new InlineAnchor("icon-cross", "Test Anchor", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent arg0) {
+				log("CLICKED--------------------GWT.getVersion()=" + GWT.getVersion());
+			}
+		}));
+
+		verticalPanel.add(new InlineAnchor("Test Anchor2", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent arg0) {
+				log("CLICKED--------------------GWT.getVersion()=" + GWT.getVersion());
+			}
+		}));
 
 		cometdClient.addConnectionListener(new CometConnectionListener() {
 			@Override
@@ -52,10 +68,6 @@ public class Cometd4GwtTest implements EntryPoint, TwitterConstant {
 				});
 
 				cometdClient.addListener(SERVER_VERSION_CHANNEL, new ServerVersionSyncar());
-			}
-
-			@Override
-			public void onUnload() {
 			}
 		});
 

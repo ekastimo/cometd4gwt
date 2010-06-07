@@ -1,33 +1,29 @@
 package org.cometd4gwt.server;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 
 import org.cometd.Client;
 import org.cometd4gwt.client.ChannelOf;
 import org.cometd4gwt.client.CometMessageConsumer;
 import org.cometd4gwt.client.Tweet;
-import org.cometd4gwt.client.TwitterConstant;
 import org.cometd4gwt.client.TwitterService;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 @SuppressWarnings("serial")
-public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterService, TwitterConstant {
+public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterService {
 
 	private CometdServer cometServer;
-	private String serverVertion = "" + new Date().getTime();
-
-	public Map<String, Object> getServerVertion() {
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("serverVersion", serverVertion);
-		return map;
-	}
+//	private String serverVertion = "" + new Date().getTime();
+//
+//	public Map<String, Object> getServerVertion() {
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		map.put("serverVersion", serverVertion);
+//		return map;
+//	}
 
 	@Override
 	public void init() throws ServletException {
@@ -36,7 +32,7 @@ public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterS
 
 			@Override
 			public void onConnect(Client client, String request) {
-				client.deliver(client, SERVER_VERSION_CHANNEL, getServerVertion(), null);
+//				client.deliver(client, SERVER_VERSION_CHANNEL, getServerVertion(), null);
 				publishTweet(new Tweet(new Date(), toString(client, request) + " has came online"));
 			}
 
@@ -45,8 +41,8 @@ public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterS
 			}
 
 			@Override
-			public void onDisconnect(Client client, String requestHeader) {
-				publishTweet(new Tweet(new Date(), client + " is ofline, no message on /meta/disconnect"));
+			public void onDisconnect(Client client, String userId) {
+				publishTweet(new Tweet(new Date(), client + " is ofline"));
 			}
 		});
 

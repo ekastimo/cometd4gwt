@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <project name="Twitter" default="build" basedir=".">
 
-	<!-- GWT SDK Path -->
-	<property name="server.path" value="../jetty-6.1.22" />
+	<!-- GWT SDK Path 
 	<property name="gwt.sdk" location="../../gwt-2.0.0" />
+	-->
+	<property name="gwt.sdk" location="../../gwt-windows-1.7.1" />
+	<property name="server.path" value="../jetty-6.1.22" />
 
 	<property name="war.name" value="twitter" />
 

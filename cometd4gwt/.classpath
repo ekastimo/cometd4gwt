@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-api-1.1.1.jar" sourcepath="G:/_Java/cometd-1.1.1-distribution.tar/cometd-1.1.1/cometd-1.1.1-api-src.zip"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-java-server-1.1.1.jar" sourcepath="G:/_Java/cometd-1.1.1-distribution.tar/cometd-1.1.1/cometd-1.1.1-server-src.zip"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-api-1.1.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/cometd-java-server-1.1.2.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

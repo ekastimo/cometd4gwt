@@ -39,6 +39,7 @@ class CometdJsni {
 			// var name = config.@org.cometd4gwt.client.ConnectionConfig::requestHeaderName;
 			var value = config.@org.cometd4gwt.client.ConnectionConfig::requestHeaderValue;
 		    cometd.configure({
+		    	autoBatch: true,
 		        requestHeaders: {requestHeader:value},
 		        url: config.@org.cometd4gwt.client.ConnectionConfig::url,
 		        maxConnection: config.@org.cometd4gwt.client.ConnectionConfig::maxConnection,

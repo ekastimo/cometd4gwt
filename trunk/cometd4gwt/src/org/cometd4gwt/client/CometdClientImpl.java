@@ -201,4 +201,14 @@ public class CometdClientImpl implements CometdClient, CometdConstants {
 			}
 		});
 	}
+	
+	@Override
+	public void startBatch() {
+		cometd.startBatch();
+	}
+
+	@Override
+	public void endBatch() {
+		cometd.endBatch();
+	}
 }

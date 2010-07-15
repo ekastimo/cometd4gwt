@@ -20,6 +20,8 @@ public class PersistentSubscribersCometdClient implements CometdClient {
 			@Override
 			public void onConnected() {
 				if (isReconnecting) {
+					cometdClient.startBatch();
+
 					for (JavaScriptObject subscription : subscriptions.keySet()) {
 						if (subscription != null) {
 							cometdClient.unsubscribe(subscription);
@@ -27,6 +29,8 @@ public class PersistentSubscribersCometdClient implements CometdClient {
 							cometdClient.addSubscriber(subData.getChannel(), subData.getConsumer());
 						}
 					}
+
+					cometdClient.endBatch();
 				}
 			}
 
@@ -116,5 +120,15 @@ public class PersistentSubscribersCometdClient implements CometdClient {
 	@Override
 	public void publish(String channelId, IsSerializable message, String clientId, AsyncCallback<Void> callback) {
 		cometdClient.publish(channelId, message, clientId, callback);
+	}
+
+	@Override
+	public void endBatch() {
+		cometdClient.endBatch();
+	}
+
+	@Override
+	public void startBatch() {
+		cometdClient.startBatch();
 	}
 }

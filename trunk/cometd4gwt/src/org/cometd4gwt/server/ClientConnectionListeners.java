@@ -16,7 +16,7 @@ public class ClientConnectionListeners extends ArrayList<ClientConnectionListene
 
 	public ClientConnectionListeners() {
 		this._this = this;
-		this.executorService = new ThreadPoolExecutor(10, 100, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+		this.executorService = new ThreadPoolExecutor(5, 10, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
 	}
 
 	@Override

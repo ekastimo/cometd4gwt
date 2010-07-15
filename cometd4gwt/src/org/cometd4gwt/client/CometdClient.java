@@ -26,4 +26,8 @@ public interface CometdClient {
 	void disconnectAsync();
 
 	void addScriptLoadListener(ScriptLoadListener scriptLoadListener);
+
+	void startBatch();
+
+	void endBatch();
 }

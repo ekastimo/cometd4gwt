@@ -31,9 +31,9 @@ class CometdJsni {
 		$wnd.dojo.addOnLoad(function() {
 			loadListener.@org.cometd4gwt.client.ScriptLoadListener::onLoad()();
 
-//		    $wnd.dojo.addOnUnload(function() {
-//				loadListener.@org.cometd4gwt.client.ScriptLoadListener::onUnload()();
-//		    });
+		//		    $wnd.dojo.addOnUnload(function() {
+		//				loadListener.@org.cometd4gwt.client.ScriptLoadListener::onUnload()();
+		//		    });
 
 			// TODO - enable sending custom request header 
 			// var name = config.@org.cometd4gwt.client.ConnectionConfig::requestHeaderName;
@@ -68,5 +68,13 @@ class CometdJsni {
 
 		xmlhttp.open("GET",url,false);
 		xmlhttp.send(null);
+	}-*/;
+
+	public native void startBatch() /*-{
+		$wnd.dojox.cometd.startBatch();
+	}-*/;
+
+	public native void endBatch()/*-{
+		$wnd.dojox.cometd.endBatch();
 	}-*/;
 }

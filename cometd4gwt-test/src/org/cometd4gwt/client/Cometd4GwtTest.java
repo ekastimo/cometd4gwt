@@ -2,6 +2,10 @@ package org.cometd4gwt.client;
 
 import java.util.Date;
 
+import org.cometd4gwt.client.impl.CometdClientImpl;
+import org.cometd4gwt.client.impl.CometdMetaMessage;
+import org.cometd4gwt.client.impl.Subscription;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -18,7 +22,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Cometd4GwtTest implements EntryPoint, CometdConstants {
-	final CometdClient cometdClient = new PersistentSubscribersCometdClient(new CometdClientImpl());
+	final CometdClient cometdClient = new AutoReSubscribableClient(new CometdClientImpl(new CometdDojo()));
 	private boolean subscribesAdded = false;
 	private VerticalPanel verticalPanel = new VerticalPanel();
 
@@ -60,9 +64,9 @@ public class Cometd4GwtTest implements EntryPoint, CometdConstants {
 		cometdClient.addScriptLoadListener(new ScriptLoadListener() {
 			@Override
 			public void onLoad() {
-				cometdClient.addListener("/meta/*", new JsoListener<CometdJso>() {
+				cometdClient.addListener("/meta/*", new JsoListener<CometdMetaMessage>() {
 					@Override
-					public void onMessageReceived(CometdJso metaMessage) {
+					public void onMessageReceived(CometdMetaMessage metaMessage) {
 						log("metaMessage=" + new JSONObject(metaMessage));
 					}
 				});
@@ -83,18 +87,17 @@ public class Cometd4GwtTest implements EntryPoint, CometdConstants {
 		if (!subscribesAdded) {
 			subscribesAdded = true;
 
-			final JavaScriptObject subscription = cometdClient.addSubscriber(ChannelOf.TWITTER,
-					new CometMessageConsumer() {
-						@Override
-						public void onMessageReceived(IsSerializable message) {
-							log("--" + message);
-						}
-					}, new JsoListener<Subscription>() {
-						@Override
-						public void onMessageReceived(Subscription subscription) {
-							log(subscription._toString());
-						}
-					});
+			final JavaScriptObject subscription = cometdClient.addSubscriber(ChannelOf.TWITTER, new CometMessageConsumer() {
+				@Override
+				public void onMessageReceived(IsSerializable message) {
+					log("--" + message);
+				}
+			}, new JsoListener<Subscription>() {
+				@Override
+				public void onMessageReceived(Subscription subscription) {
+					log(subscription._toString());
+				}
+			});
 
 			log("subscription=" + new JSONObject(subscription));
 
@@ -114,6 +117,7 @@ public class Cometd4GwtTest implements EntryPoint, CometdConstants {
 
 		textArea.addKeyUpHandler(new KeyUpHandler() {
 			TwitterServiceAsync twitterService = GWT.create(TwitterService.class);
+
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				int keyCode = event.getNativeKeyCode();

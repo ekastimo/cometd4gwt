@@ -1,5 +1,7 @@
 package org.cometd4gwt.client;
 
+import org.cometd4gwt.client.impl.Subscription;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;

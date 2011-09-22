@@ -20,10 +20,8 @@ public class BayeuxInitializer extends HttpServlet {
 	}
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String clientId = request.getParameter("clientId");
-//		System.err.println("request.getParameter(clientId)=" + clientId);
 		if (clientId != null) {
 			cometdServer.diconnect(clientId);
 		}

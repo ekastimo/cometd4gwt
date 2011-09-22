@@ -1,0 +1,2 @@
+serviceClass: org.cometd4gwt.client.MetaService
+path: 85064F522387D22A34C41525C8A88024.gwt.rpc

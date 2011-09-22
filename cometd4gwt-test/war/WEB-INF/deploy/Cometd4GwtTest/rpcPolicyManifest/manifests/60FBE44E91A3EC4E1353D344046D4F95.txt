@@ -1,0 +1,2 @@
+serviceClass: org.cometd4gwt.client.TwitterService
+path: C69C4DB4CAC0548F495A7D93B5344A60.gwt.rpc

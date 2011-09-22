@@ -21,7 +21,6 @@ public class BayeuxSubscriber extends BayeuxService implements CometdConstants {
 	}
 
 	public void onMessage(Client remote, Map<String, Object> data) {
-		// System.out.println(this + ".onMessage-" + remote);
 		consumer.onMessageReceived((IsSerializable) data.get(OBJECT_MESSAGE));
 	}
 }

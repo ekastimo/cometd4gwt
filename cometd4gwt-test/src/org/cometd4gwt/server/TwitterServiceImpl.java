@@ -16,6 +16,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class TwitterServiceImpl extends RemoteServiceServlet implements TwitterService {
 
+	
 	private CometdServer cometServer;
 //	private String serverVertion = "" + new Date().getTime();
 //
